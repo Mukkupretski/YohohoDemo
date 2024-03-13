@@ -44,12 +44,27 @@ abstract class Interactable extends Thing {
   ) {
     super(imageSrc, width, height, x, y);
   }
-  abstract overlap(player: OwnPlayer): boolean;
-  abstract interact(player: OwnPlayer, context: CanvasRenderingContext2D): void;
+  overlap(player: OwnPlayer): boolean {
+    return (
+      (this.width / player.size + player.width) / 2 <
+        Math.abs(this.x - player.x) / player.size &&
+      (this.height / player.size + player.height) / 2 <
+        Math.abs(this.y - player.y) / player.size
+    );
+  }
 }
 class Tree extends Thing {
   constructor(x: number, y: number) {
     super("Images/tree.png", 384, 384, x, y);
   }
-  update(player: OwnPlayer, context: CanvasRenderingContext2D): void {}
+}
+class Bush extends Thing {
+  constructor(x: number, y: number) {
+    super("Images/bush.png", 128, 128, x, y);
+  }
+}
+class Skull extends Thing {
+  constructor(x: number, y: number) {
+    super("Images/skull.png", 256, 256, x, y);
+  }
 }
