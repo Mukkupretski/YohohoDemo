@@ -1,11 +1,12 @@
 import { OwnPlayer } from "./playerclasses";
 
 abstract class Thing {
-  imageSrc: string;
+  image: CanvasImageSource;
   width: number;
   height: number;
   x: number;
   y: number;
+  loaded: boolean;
   constructor(
     imageSrc: string,
     width: number,
@@ -13,7 +14,12 @@ abstract class Thing {
     x: number,
     y: number
   ) {
-    this.imageSrc = imageSrc;
+    this.loaded = false;
+    this.image = document.createElement("img");
+    this.image.src = imageSrc;
+    this.image.onload = () => {
+      this.loaded = true;
+    };
     this.width = width;
     this.height = height;
     this.x = x;
@@ -52,7 +58,9 @@ abstract class Interactable extends Thing {
         Math.abs(this.y - player.y) / player.size
     );
   }
+  abstract update(player: OwnPlayer, context: CanvasRenderingContext2D): void;
 }
+
 class Tree extends Thing {
   constructor(x: number, y: number) {
     super("Images/tree.png", 384, 384, x, y);
