@@ -15,7 +15,7 @@ A demo version of the game Yohohoho
 - Fire
 - Holes
 
-* FIRE IN THE HOLE
+* **FIRE IN THE HOLE**
 
 ## Is it related to Yohoho.io?
 
