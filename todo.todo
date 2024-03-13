@@ -17,7 +17,7 @@ Skull (onplayerdeath): 256x256px
 Tree: 384x384px
 Bush: 128x128px;
 Hut: 512x512px
-Hutfloor: 480x480px
+Hutfloor: 512x512px
 
 Chatbubble: 128x128px
 Emotesheet: 256x256px

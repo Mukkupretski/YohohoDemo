@@ -12,9 +12,9 @@ A demo version of the game Yohohoho
 - Battles
 - Emotes
 - Toxic emotes
+- SharkNado™
 - Fire
 - Holes
-- SharkNado™
 
 * **FIRE IN THE HOLE**
 
