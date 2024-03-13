@@ -14,6 +14,7 @@ A demo version of the game Yohohoho
 - Toxic emotes
 - Fire
 - Holes
+- SharkNado
 
 * **FIRE IN THE HOLE**
 
