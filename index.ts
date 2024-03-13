@@ -8,6 +8,12 @@ import {
   OtherPlayer,
 } from "./Types/eventtypes";
 
+//Configuring dotenv
+
+import dotenv from "dotenv";
+
+dotenv.config();
+
 //Preventing movement during text input editing
 
 const name: HTMLInputElement = document.querySelector("#name")!;
@@ -43,18 +49,13 @@ const connect: HTMLInputElement = document.querySelector("#connect")!;
 if (localStorage.getItem("connection") == "http://localhost:3000") {
   connect.checked = true;
 } else if (localStorage.getItem("connetion") == null) {
-  localStorage.setItem(
-    "connection",
-    "https://w8b2j173-3000.euw.devtunnels.ms/"
-  );
+  localStorage.setItem("connection", process.env.DEVTUNNEL!);
 }
 
 function changeServer(e: Event) {
   localStorage.setItem(
     "connection",
-    connect.checked
-      ? "http://localhost:3000"
-      : "https://w8b2j173-3000.euw.devtunnels.ms/"
+    connect.checked ? "http://localhost:3000" : process.env.DEVTUNNEL!
   );
   connect.removeEventListener("change", changeServer);
   window.location.reload();
