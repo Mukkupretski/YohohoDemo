@@ -1,0 +1,33 @@
+TODO:
+
+-Classes
+-Better movement
+-Images
+
+PlayerSheets (4x4 players) 1024x1024px:
+    PlayerIcon: 256x256px:
+
+SwordSheets: 4 swords, 4 versions (noglow, whiteglow, lightlightblueglow, lightblueglow) -> (256x1024px):
+    1 sword: 256x64, four versions form a column
+
+Coin: 32x32px
+Pileofcoins: 32x32px
+Treasure: 256x128px
+Skull (onplayerdeath): 256x256px
+Tree: 384x384px
+Bush: 128x128px;
+Hut: 512x512px
+Hutfloor: 480x480px
+
+Chatbubble: 128x128px
+Emotesheet: 256x256px
+    Emote: 64x64px
+
+-Player to center, new rendering
+-Map generation
+-Swords
+-Fighting and dying
+-Emotes
+
+
+-Move to the actual version from the demo
