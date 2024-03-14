@@ -7,6 +7,9 @@ TODO:
 PlayerSheets (4x4 players) 1024x1024px: (1/16)
     PlayerIcon: 256x256px (facing up)
 
+HandSheet (4x4 hands, one for each player):
+    Hand: 32x32px
+
 SwordSheets: 4 swords, 2 versions (basic and glow) -> (128x1024px):
     1 sword: 256x64, four versions form a column (facing left)
 
