@@ -8,12 +8,6 @@ import {
   OtherPlayer,
 } from "./Types/eventtypes";
 
-//Configuring dotenv
-
-import dotenv from "dotenv";
-
-dotenv.config();
-
 //Preventing movement during text input editing
 
 const name: HTMLInputElement = document.querySelector("#name")!;
@@ -49,13 +43,18 @@ const connect: HTMLInputElement = document.querySelector("#connect")!;
 if (localStorage.getItem("connection") == "http://localhost:3000") {
   connect.checked = true;
 } else if (localStorage.getItem("connetion") == null) {
-  localStorage.setItem("connection", process.env.DEVTUNNEL!);
+  localStorage.setItem(
+    "connection",
+    "https://w8b2j173-3000.euw.devtunnels.ms/"
+  );
 }
 
 function changeServer(e: Event) {
   localStorage.setItem(
     "connection",
-    connect.checked ? "http://localhost:3000" : process.env.DEVTUNNEL!
+    connect.checked
+      ? "http://localhost:3000"
+      : "https://w8b2j173-3000.euw.devtunnels.ms/"
   );
   connect.removeEventListener("change", changeServer);
   window.location.reload();
@@ -142,16 +141,19 @@ window.addEventListener("keydown", (e) => {
         player.x -= 10;
       }
       break;
+
     case "d":
       if (player.x < canvas.width - 100) {
         player.x += 10;
       }
       break;
+
     case "w":
       if (player.y > 0) {
         player.y -= 10;
       }
       break;
+
     case "s":
       if (player.y < canvas.height - 100) {
         player.y += 10;
@@ -161,5 +163,4 @@ window.addEventListener("keydown", (e) => {
 });
 
 //Renders game
-
 renderGame();

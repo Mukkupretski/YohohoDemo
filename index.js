@@ -67,6 +67,8 @@ game.fillRect(0, 0, 100, 100);
 window.addEventListener("resize", function () {
     canvas.width = window.innerWidth;
     canvas.height = 0.9 * window.innerHeight;
+    game.fillStyle = "gray";
+    game.font = "16px Arial";
 });
 //Game rendering
 function drawPlayer() {
