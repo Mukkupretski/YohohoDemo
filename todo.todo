@@ -4,17 +4,16 @@ TODO:
 -Better movement
 -Images
 
-PlayerSheets (4x4 players) 1024x1024px:
+PlayerSheets (4x4 players) 1024x1024px: (1/16)
     PlayerIcon: 256x256px (facing up)
 
-SwordSheets: 4 swords, 4 versions (noglow, whiteglow, lightlightblueglow, lightblueglow) -> (256x1024px):
+SwordSheets: 4 swords, 2 versions (basic and glow) -> (128x1024px):
     1 sword: 256x64, four versions form a column (facing left)
 
-Coin: 32x32px
-Pileofcoins: 32x32px
+Coin: 32x32px - Done
 Treasure: 256x128px
 Skull (onplayerdeath): 256x256px
-Tree: 384x384px
+Tree: 384x384px - Done
 Bush: 128x128px;
 Hut: 512x512px
 Hutfloor: 512x512px
