@@ -5,10 +5,10 @@ TODO:
 -Images
 
 PlayerSheets (4x4 players) 1024x1024px:
-    PlayerIcon: 256x256px:
+    PlayerIcon: 256x256px (facing up)
 
 SwordSheets: 4 swords, 4 versions (noglow, whiteglow, lightlightblueglow, lightblueglow) -> (256x1024px):
-    1 sword: 256x64, four versions form a column
+    1 sword: 256x64, four versions form a column (facing left)
 
 Coin: 32x32px
 Pileofcoins: 32x32px
