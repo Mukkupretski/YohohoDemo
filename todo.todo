@@ -4,7 +4,7 @@ TODO:
 -Better movement
 -Images
 
-PlayerSheets (4x4 players) 1024x1024px: (1/16)
+PlayerSheets (4x4 players) 1024x1024px: (2/16)
     PlayerIcon: 256x256px (facing up)
 
 HandSheet (4x4 hands, one for each player):
