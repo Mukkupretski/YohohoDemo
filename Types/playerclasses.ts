@@ -1,23 +1,28 @@
-import { Skins, getSkinPath } from "./enums";
+import { Skins, Swords, getSkinPos } from "./enums";
+import { Sword } from "./playermiscclasses";
 
 export abstract class Player {
   rotation: number;
   x: number;
   y: number;
   size: number;
+  name: string;
   width: number;
   health: number;
   height: number;
   image: CanvasImageSource | undefined;
   speedVector: [number, number];
   skin: Skins;
+  sword: Sword;
   constructor(
     x: number,
     y: number,
     size: number,
     skin: Skins,
+    swordskin: Swords,
     rotation: number,
-    health: number
+    health: number,
+    name: string
   ) {
     this.x = x;
     this.y = y;
@@ -25,10 +30,11 @@ export abstract class Player {
     this.width = 256;
     this.height = 256;
     this.skin = skin;
+    this.sword = new Sword(swordskin, this);
     this.rotation = rotation;
     this.health = health;
     this.speedVector = [0, 0];
-
+    this.name = name;
     const skinImage = document.createElement("img");
     skinImage.src = "Images/skinsheet.png";
     skinImage.onload = () => {
@@ -51,8 +57,8 @@ export class OwnPlayer extends Player {
   coins: number;
   isDashing: boolean;
   isAttacking: boolean;
-  constructor(x: number, y: number, skin: Skins) {
-    super(x, y, 1, skin, 0, 100);
+  constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
+    super(x, y, 1, skin, swordskin, 0, 100, "");
     this.targetrotation = 0;
     this.coins = 0;
     this.isDashing = false;
@@ -60,6 +66,30 @@ export class OwnPlayer extends Player {
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     context.save();
+    context.rotate((-this.rotation * Math.PI) / 180);
+    context.translate(context.canvas.width, context.canvas.height);
+    const skinpos = getSkinPos(this.skin);
+    if (this.image) {
+      context.drawImage(
+        this.image,
+        256 * skinpos[0],
+        256 * skinpos[1],
+        256,
+        256,
+        -this.width / 2,
+        -this.width / 2,
+        this.width,
+        this.height
+      );
+    } else {
+      context.fillRect(
+        -this.width / 2,
+        -this.width / 2,
+        this.width,
+        this.height
+      );
+    }
+    context.restore();
   }
   update(
     context: CanvasRenderingContext2D,
@@ -108,8 +138,8 @@ export class OwnPlayer extends Player {
             (this.rotation +
               Math.sign(this.targetrotation - this.rotation) *
                 (Math.abs(this.rotation - this.targetrotation) > 180
-                  ? 5
-                  : -5)) %
+                  ? -5
+                  : 5)) %
             360;
           if (this.rotation < 0) {
             this.rotation += 360;
@@ -121,16 +151,20 @@ export class OwnPlayer extends Player {
   }
 }
 export class OtherPlayer extends Player {
+  id: string;
   constructor(
     x: number,
     y: number,
     size: number,
     skin: Skins,
+    swordskin: Swords,
     rotation: number,
     health: number,
-    id: string
+    id: string,
+    name: string
   ) {
-    super(x, y, size, skin, rotation, health);
+    super(x, y, size, skin, swordskin, rotation, health, name);
+    this.id = id;
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {}
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {}

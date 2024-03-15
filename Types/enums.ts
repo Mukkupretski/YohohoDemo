@@ -1,20 +1,23 @@
 export enum Skins {
   AMOGUS,
+  NORMAL,
 }
 
 export enum Swords {
   DEFAULT,
 }
 
-export function getSkinPath(skin: Skins): [number, number] {
+export function getSkinPos(skin: Skins): [number, number] {
   let pos: [number, number];
   switch (skin) {
     case Skins.AMOGUS:
       pos = [0, 0];
+    case Skins.NORMAL:
+      pos = [1, 0];
   }
   return pos;
 }
-export function getSwordPath(sword: Swords): [number, number] {
+export function getSwordPos(sword: Swords): [number, number] {
   let pos: [number, number];
   switch (sword) {
     case Swords.DEFAULT:
