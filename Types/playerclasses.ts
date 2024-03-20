@@ -13,6 +13,7 @@ export abstract class Player {
   image: CanvasImageSource | undefined;
   speedVector: [number, number];
   skin: Skins;
+  swordskin: Swords;
   sword: Sword;
   constructor(
     x: number,
@@ -30,8 +31,9 @@ export abstract class Player {
     this.width = 256;
     this.height = 256;
     this.skin = skin;
-    this.sword = new Sword(swordskin, this);
+    this.sword = new Sword(this);
     this.rotation = rotation;
+    this.swordskin = swordskin;
     this.health = health;
     this.speedVector = [0, 0];
     this.name = name;
@@ -44,11 +46,10 @@ export abstract class Player {
   abstract draw(player: OwnPlayer, context: CanvasRenderingContext2D): void;
 
   changeSkin(skin: Skins): void {
-    const skinImage = document.createElement("img");
-    skinImage.src = "../Images/skinsheet.png";
-    skinImage.onload = () => {
-      this.image = skinImage;
-    };
+    this.skin = skin;
+  }
+  changeSwordSkin(swordskin: Swords): void {
+    this.swordskin = swordskin;
   }
 }
 

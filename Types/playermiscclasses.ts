@@ -1,5 +1,6 @@
-import { Swords } from "./enums";
+import { Swords, getSkinPos, getSwordPos } from "./enums";
 import { OwnPlayer, Player } from "./playerclasses";
+import { Thing } from "./thingclasses";
 
 export type Obj = {
   width: number;
@@ -9,20 +10,15 @@ export type Obj = {
 };
 
 export class Sword {
-  skin: Swords;
   owner: Player;
   handimg: CanvasImageSource | undefined;
   swordimg: CanvasImageSource | undefined;
   angle: number;
   direction: "static" | "left" | "right";
-  hand: Obj;
-  sword: Obj;
-  constructor(skin: Swords, owner: Player) {
-    this.hand = this.getHand();
-    this.sword = this.getSword();
+
+  constructor(owner: Player) {
     this.angle = 30;
     this.direction = "static";
-    this.skin = skin;
     this.owner = owner;
     const handel = document.createElement("img");
     handel.src = "../Images/handsheet.png";
@@ -35,22 +31,7 @@ export class Sword {
       this.swordimg = swordel;
     };
   }
-  getHand(): Obj {
-    return {
-      width: 64,
-      height: 64,
-      x: this.owner.x - this.owner.width / 2,
-      y: this.owner.y,
-    };
-  }
-  getSword(): Obj {
-    return {
-      width: 256,
-      height: 64,
-      x: this.owner.x - this.owner.width / 2 - 128,
-      y: this.owner.y,
-    };
-  }
+
   swing() {
     switch (this.angle) {
       case 30:
@@ -60,8 +41,53 @@ export class Sword {
     }
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
-    context.rotate(this.angle);
-    context.translate;
+    context.save();
+    context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
+    Thing.doTranslate(player, context, this.owner);
+    context.fillStyle = "black";
+    if (this.handimg) {
+      const skinpos = getSkinPos(this.owner.skin);
+      context.drawImage(
+        this.handimg,
+        skinpos[0] * 64,
+        skinpos[1] * 64,
+        64,
+        64,
+        (-this.owner.width - 32) / player.width,
+        -32 / player.width,
+        64 / player.width,
+        64 / player.width
+      );
+    } else {
+      context.fillRect(
+        (-this.owner.width - 32) / player.width,
+        -32 / player.width,
+        64 / player.width,
+        64 / player.width
+      );
+    }
+    if (this.swordimg) {
+      const skinpos = getSwordPos(this.owner.swordskin);
+      context.drawImage(
+        this.swordimg,
+        skinpos[0] * 256,
+        skinpos[1] * 64,
+        256,
+        64,
+        (-this.owner.width - 128) / player.width,
+        -32 / player.width,
+        256 / player.width,
+        64 / player.width
+      );
+    } else {
+      context.fillRect(
+        (-this.owner.width - 128) / player.width,
+        -32 / player.width,
+        256 / player.width,
+        64 / player.width
+      );
+    }
+    context.restore();
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D) {
     if (this.direction !== "static") {
@@ -75,6 +101,7 @@ export class Sword {
         this.angle += (this.direction === "right" ? 1 : -1) * 15;
       }
     }
+
     this.draw(player, context);
   }
 }
