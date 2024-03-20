@@ -1,4 +1,4 @@
-import { OwnPlayer } from "./playerclasses";
+import { OwnPlayer, Player } from "./playerclasses";
 
 export abstract class Thing {
   image: CanvasImageSource | undefined;
@@ -38,18 +38,7 @@ export abstract class Thing {
     if (!this.isInscreen(player, context.canvas)) return;
     context.save();
     context.rotate(((-2 * Math.PI) / 180) * this.rotation);
-    context.translate(
-      context.canvas.width / 2 -
-        player.width / 2 +
-        (this.width - this.width / player.size) / 2 +
-        (this.x - player.x) / player.size +
-        this.width / player.size / 2,
-      context.canvas.height / 2 -
-        player.height / 2 +
-        (this.height - this.height / player.size) / 2 +
-        (this.y - player.y) / player.size +
-        this.height / player.size / 2
-    );
+    Thing.doTranslate(player, context, this);
     if (this.image) {
       context.drawImage(
         this.image,
@@ -71,6 +60,34 @@ export abstract class Thing {
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     this.draw(player, context);
+  }
+  static doTranslate(
+    player: OwnPlayer,
+    context: CanvasRenderingContext2D,
+    obj:
+      | Thing
+      | Player
+      | { width: number; height: number; x: number; y: number }
+  ) {
+    //1. Put to center
+    //2. Move respectively to the own player's position (scaled by own player's size)
+    //3. Now the corner is in the correct place (same as if player's size was 1) but we want center to be in correct place
+    //So we calculate the 'gap' between current size and normal size and divide it by two to center the square
+    //4. The square is rendered at ((-width/player.size)/2,(-height/player.size)/2) for rotation so we fix that offset
+    context.translate(
+      //X
+      context.canvas.width / 2 -
+        player.width / 2 +
+        (obj.width - obj.width / player.size) / 2 +
+        (obj.x - player.x) / player.size +
+        obj.width / player.size / 2,
+      //Y
+      context.canvas.height / 2 -
+        player.height / 2 +
+        (obj.height - obj.height / player.size) / 2 +
+        (obj.y - player.y) / player.size +
+        obj.height / player.size / 2
+    );
   }
 }
 export abstract class Interactable extends Thing {
