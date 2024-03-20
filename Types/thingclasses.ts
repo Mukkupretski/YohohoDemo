@@ -1,4 +1,5 @@
 import { OwnPlayer, Player } from "./playerclasses";
+import { Obj } from "./playermiscclasses";
 
 export abstract class Thing {
   image: CanvasImageSource | undefined;
@@ -64,10 +65,7 @@ export abstract class Thing {
   static doTranslate(
     player: OwnPlayer,
     context: CanvasRenderingContext2D,
-    obj:
-      | Thing
-      | Player
-      | { width: number; height: number; x: number; y: number }
+    obj: Thing | Player | Obj
   ) {
     //1. Put to center
     //2. Move respectively to the own player's position (scaled by own player's size)
