@@ -1,33 +1,37 @@
 TODO:
 
+
+FIX THAT OTHER PLAYERS' SIZES DON'T MATTER PLS PLS PLS WHY WHY
+
+
 -Classes
 -Better movement
 -Images
 
-PlayerSheets (4x4 players) 1024x1024px: (2/16)
+PlayerSheets (4x4 players) 1024x1024px: (2/16)                                       skinsheet.png
     PlayerIcon: 256x256px (facing up)
 
-HandSheet (4x4 hands, one for each player):
+HandSheet (4x4 hands, one for each player) (2/16):                                   handsheet.png
     Hand: 64x64px
 
-SwordSheets: 4 swords, 2 versions (basic and glow) -> (128x1024px):
+SwordSheets: 4 swords, 2 versions (basic and glow) -> (128x1024px):                  swordsheet.png
     1 sword: 256x64, four versions form a column (facing left)
 
-Coin: 32x32px - Done
-Treasure: 256x128px
-Skull (onplayerdeath): 256x256px
-Tree: 384x384px - Done
-Bush: 128x128px;
-Hut: 512x512px
-Hutfloor: 512x512px
+Coin: 32x32px - √                                                                    coin.png
+Treasure: 256x128px                                                                  treasure.png
+Skull (onplayerdeath): 256x256px                                                     skull.png
+Tree: 384x384px - √                                                                  tree.png
+Bush: 128x128px                                                                      bush.png
+Hut: 512x512px                                                                       hut.png
+Hutfloor: 512x512px                                                                  hutfloor.png
 
-Chatbubble: 128x128px
-Emotesheet: 256x256px
+Chatbubble: 128x128px                                                                chatbubble.png
+Emotesheet: 256x256px                                                                emotesheet.png
     Emote: 64x64px
 
 -Player to center, new rendering
 -Map generation
--Swords
+-Swords √
 -Fighting and dying
 -Emotes
 
