@@ -1,5 +1,6 @@
 import { Skins, Swords, getSkinPos } from "./enums";
 import { Sword } from "./playermiscclasses";
+import { Thing } from "./thingclasses";
 
 export abstract class Player {
   rotation: number;
@@ -43,13 +44,34 @@ export abstract class Player {
       this.image = skinImage;
     };
   }
-  abstract draw(player: OwnPlayer, context: CanvasRenderingContext2D): void;
-
-  changeSkin(skin: Skins): void {
-    this.skin = skin;
-  }
-  changeSwordSkin(swordskin: Swords): void {
-    this.swordskin = swordskin;
+  draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
+    const scale = this.size / player.size;
+    this.sword.update(player, context);
+    context.save();
+    context.rotate((-this.rotation / 180) * Math.PI);
+    Thing.doTranslate(player, context, this, this.size);
+    if (this.image) {
+      const skinpos = getSkinPos(this.skin);
+      context.drawImage(
+        this.image,
+        256 * skinpos[0],
+        256 * skinpos[1],
+        256,
+        256,
+        (-this.width / 2) * scale,
+        (-this.width / 2) * scale,
+        this.width * scale,
+        this.height * scale
+      );
+    } else {
+      context.fillRect(
+        (-this.width / 2) * scale,
+        (-this.width / 2) * scale,
+        this.width * scale,
+        this.height * scale
+      );
+    }
+    context.restore();
   }
 }
 
@@ -64,33 +86,6 @@ export class OwnPlayer extends Player {
     this.coins = 0;
     this.isDashing = false;
     this.isAttacking = false;
-  }
-  draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
-    context.save();
-    context.rotate((-this.rotation * Math.PI) / 180);
-    context.translate(context.canvas.width, context.canvas.height);
-    const skinpos = getSkinPos(this.skin);
-    if (this.image) {
-      context.drawImage(
-        this.image,
-        256 * skinpos[0],
-        256 * skinpos[1],
-        256,
-        256,
-        -this.width / 2,
-        -this.width / 2,
-        this.width,
-        this.height
-      );
-    } else {
-      context.fillRect(
-        -this.width / 2,
-        -this.width / 2,
-        this.width,
-        this.height
-      );
-    }
-    context.restore();
   }
   update(
     context: CanvasRenderingContext2D,
@@ -150,6 +145,16 @@ export class OwnPlayer extends Player {
     }
     this.draw(this, context);
   }
+  changeSkin(skin: Skins): void {
+    this.skin = skin;
+  }
+  changeSwordSkin(swordskin: Swords): void {
+    this.swordskin = swordskin;
+  }
+  grow(amount: number) {
+    this.size += amount / 10;
+    this.health = 100 * this.size;
+  }
 }
 export class OtherPlayer extends Player {
   id: string;
@@ -167,6 +172,17 @@ export class OtherPlayer extends Player {
     super(x, y, size, skin, swordskin, rotation, health, name);
     this.id = id;
   }
-  draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {}
-  update(player: OwnPlayer, context: CanvasRenderingContext2D): void {}
+  update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
+    this.draw(player, context);
+  }
+  setProperties(player: OtherPlayer) {
+    this.x = player.x;
+    this.y = player.y;
+    this.size = player.size;
+    this.skin = player.skin;
+    this.swordskin = player.swordskin;
+    this.health = player.health;
+    this.rotation = player.rotation;
+    this.name = player.name;
+  }
 }

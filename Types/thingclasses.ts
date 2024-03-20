@@ -51,8 +51,8 @@ export abstract class Thing {
     } else {
       context.fillStyle = "black";
       context.fillRect(
-        (this.x - player.x) / player.size,
-        (this.y - player.y) / player.size,
+        -this.width / player.size / 2,
+        -this.height / player.size / 2,
         this.width / player.size,
         this.height / player.size
       );
@@ -65,26 +65,28 @@ export abstract class Thing {
   static doTranslate(
     player: OwnPlayer,
     context: CanvasRenderingContext2D,
-    obj: Thing | Player | Obj
+    obj: Thing | Player | Obj,
+    size?: number
   ) {
-    //1. Put to center
-    //2. Move respectively to the own player's position (scaled by own player's size)
-    //3. Now the corner is in the correct place (same as if player's size was 1) but we want center to be in correct place
-    //So we calculate the 'gap' between current size and normal size and divide it by two to center the square
-    //4. The square is rendered at ((-width/player.size)/2,(-height/player.size)/2) for rotation so we fix that offset
+    const scale: number = (size ?? 1) / player.size;
+    //1. Put top corner to center
+    //2. Put center of the object to center (the width of object is obj.width*scale so we divide that with 2 and same with height)
+    //3. Move respectively to the own player's position (scaled by scale)
+    //4. Now the object would be at correct place if scale was 1 but else the top corner is offset by width*(1-scale)/2 so we fix that (same with height)
+    //5. The square is rendered at ((-width*scale)/2,(-height*scale)/2) for rotation so we fix that offset
     context.translate(
       //X
       context.canvas.width / 2 -
-        player.width / 2 +
-        (obj.width - obj.width / player.size) / 2 +
-        (obj.x - player.x) / player.size +
-        obj.width / player.size / 2,
+        (obj.width / 2) * scale +
+        (obj.width - obj.width * scale) / 2 +
+        (obj.x - player.x) * scale +
+        (obj.width * scale) / 2,
       //Y
       context.canvas.height / 2 -
-        player.height / 2 +
-        (obj.height - obj.height / player.size) / 2 +
-        (obj.y - player.y) / player.size +
-        obj.height / player.size / 2
+        (obj.height / 2) * scale +
+        (obj.height - obj.height * scale) / 2 +
+        (obj.y - player.y) * scale +
+        (obj.height * scale) / 2
     );
   }
 }

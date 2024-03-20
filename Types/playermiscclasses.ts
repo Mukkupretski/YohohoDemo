@@ -9,6 +9,44 @@ export type Obj = {
   y: number;
 };
 
+export class PlayerHeader {
+  owner: Player;
+  constructor(owner: Player) {
+    this.owner = owner;
+  }
+  draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
+    context.save();
+    Thing.doTranslate(player, context, this.owner, this.owner.size);
+    //How heights are calculated:
+    //Player: 128px, gap: 10px, healthbar: 32px, gap: 10px,
+    //And scaled by player width
+    context.strokeStyle = "none";
+    context.fillStyle = "red";
+    context.fillRect(
+      -96 / player.size,
+      (-this.owner.width / 2 - 10 - 32) / player.size,
+      192 / player.size,
+      32 / player.size
+    );
+    context.fillStyle = "green";
+    context.fillRect(
+      -96 / player.size,
+      (-this.owner.width / 2 - 10 - 32) / player.size,
+      ((this.owner.health / (this.owner.size * 100)) * 192) / player.size,
+      32 / player.size
+    );
+    context.textAlign = "center";
+    context.textBaseline = "bottom";
+    context.fillStyle = "black";
+    context.font = `${32 / player.width}px Arial`;
+    context.fillText;
+    context.restore();
+  }
+  update(player: OwnPlayer, context: CanvasRenderingContext2D) {
+    this.draw(player, context);
+  }
+}
+
 export class Sword {
   owner: Player;
   handimg: CanvasImageSource | undefined;
@@ -26,7 +64,7 @@ export class Sword {
       this.handimg = handel;
     };
     const swordel = document.createElement("img");
-    swordel.src = "../Images/handsheet.png";
+    swordel.src = "../Images/swordsheet.png";
     swordel.onload = () => {
       this.swordimg = swordel;
     };
@@ -43,7 +81,7 @@ export class Sword {
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     context.save();
     context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
-    Thing.doTranslate(player, context, this.owner);
+    Thing.doTranslate(player, context, this.owner, this.owner.size);
     context.fillStyle = "black";
     if (this.handimg) {
       const skinpos = getSkinPos(this.owner.skin);
