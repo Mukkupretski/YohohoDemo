@@ -78,13 +78,13 @@ export abstract class Player {
 export class OwnPlayer extends Player {
   targetrotation: number;
   coins: number;
-  isDashing: boolean;
+  dashAcc: number;
   isAttacking: boolean;
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, swordskin, 0, 100, "");
     this.targetrotation = 0;
     this.coins = 0;
-    this.isDashing = false;
+    this.dashAcc = 0;
     this.isAttacking = false;
   }
   update(
@@ -97,14 +97,35 @@ export class OwnPlayer extends Player {
       spacebartime: number;
     }
   ): void {
-    if (this.isDashing) {
-    } else if (this.isAttacking) {
-    } else if (keys.spacebartime != 0) {
+    if (keys.spacebartime != 0 && !this.isAttacking && this.dashAcc != 0) {
       if (keys.spacebartime < 1) {
         this.isAttacking = true;
+        this.sword.swing();
       } else {
         const power = Math.max(keys.spacebartime / 1000, 3);
-        this.speedVector = [power, 0];
+        this.speedVector = [
+          power * Math.cos(((this.rotation + 90) / 180) * Math.PI),
+          power * Math.sin(((this.rotation + 90) / 180) * Math.PI),
+        ];
+        this.dashAcc = power / 8;
+      }
+    }
+    if (this.dashAcc != 0) {
+      if (this.speedVector[0] < 0)
+        this.speedVector[0] -=
+          this.dashAcc * Math.cos(((this.rotation + 90) / 180) * Math.PI);
+      this.speedVector[1] -=
+        this.dashAcc * Math.sin(((this.rotation + 90) / 180) * Math.PI);
+      if (
+        Math.abs(this.speedVector[0]) <= 1 &&
+        Math.abs(this.speedVector[1]) <= 1
+      ) {
+        this.dashAcc = 0;
+      }
+    } else if (this.isAttacking) {
+      this.speedVector = [0, 0];
+      if (this.sword.direction === "static") {
+        this.isAttacking = false;
       }
     }
     //Happens only if player is not attacking or geometry dashing
@@ -143,6 +164,7 @@ export class OwnPlayer extends Player {
         }
       }
     }
+
     this.draw(this, context);
   }
   changeSkin(skin: Skins): void {
