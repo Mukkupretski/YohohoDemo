@@ -115,7 +115,19 @@ export class Sword {
       context.drawImage(
         this.swordimg,
         skinpos[0] * 256,
-        skinpos[1] * 64,
+        skinpos[1] * 128,
+        256,
+        64,
+        (-this.owner.width - 128) * scale,
+        -32 * scale,
+        256 * scale,
+        64 * scale
+      );
+      context.globalAlpha = player.swordopacity;
+      context.drawImage(
+        this.swordimg,
+        skinpos[0] * 256,
+        skinpos[1] * 128 + 64,
         256,
         64,
         (-this.owner.width - 128) * scale,
