@@ -16,6 +16,7 @@ export abstract class Player {
   skin: Skins;
   swordskin: Swords;
   sword: Sword;
+  swordopacity: number;
   constructor(
     x: number,
     y: number,
@@ -24,7 +25,8 @@ export abstract class Player {
     swordskin: Swords,
     rotation: number,
     health: number,
-    name: string
+    name: string,
+    swordopacity: number
   ) {
     this.x = x;
     this.y = y;
@@ -38,6 +40,7 @@ export abstract class Player {
     this.health = health;
     this.speedVector = [0, 0];
     this.name = name;
+    this.swordopacity = swordopacity;
     const skinImage = document.createElement("img");
     skinImage.src = "../Images/skinsheet.png";
     skinImage.onload = () => {
@@ -81,7 +84,7 @@ export class OwnPlayer extends Player {
   dashAcc: number;
   isAttacking: boolean;
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
-    super(x, y, 1, skin, swordskin, 0, 100, "");
+    super(x, y, 1, skin, swordskin, 0, 100, "", 0);
     this.targetrotation = 0;
     this.coins = 0;
     this.dashAcc = 0;
@@ -95,14 +98,18 @@ export class OwnPlayer extends Player {
       s: boolean;
       a: boolean;
       spacebartime: number;
+      spacebarhold: number;
     }
   ): void {
+    //Check if spacebar was pressed and there is no current spacebar action
     if (keys.spacebartime != 0 && !this.isAttacking && this.dashAcc != 0) {
+      //Swing attack
       if (keys.spacebartime < 1) {
         this.isAttacking = true;
         this.sword.swing();
+        //Geometry dash attack
       } else {
-        const power = Math.max(keys.spacebartime / 1000, 3);
+        const power = Math.min(keys.spacebartime / 1000, 3);
         this.speedVector = [
           power * Math.cos(((this.rotation + 90) / 180) * Math.PI),
           power * Math.sin(((this.rotation + 90) / 180) * Math.PI),
@@ -110,12 +117,14 @@ export class OwnPlayer extends Player {
         this.dashAcc = power / 8;
       }
     }
+    //Slowing dash
     if (this.dashAcc != 0) {
       if (this.speedVector[0] < 0)
         this.speedVector[0] -=
           this.dashAcc * Math.cos(((this.rotation + 90) / 180) * Math.PI);
       this.speedVector[1] -=
         this.dashAcc * Math.sin(((this.rotation + 90) / 180) * Math.PI);
+      //Stopping dash when slow enough
       if (
         Math.abs(this.speedVector[0]) <= 1 &&
         Math.abs(this.speedVector[1]) <= 1
@@ -130,6 +139,8 @@ export class OwnPlayer extends Player {
     }
     //Happens only if player is not attacking or geometry dashing
     else {
+      //Changing sword opacity
+      this.swordopacity = Math.min(keys.spacebarhold / 1000, 1);
       //Set speed vector by which keys are pressed
       this.speedVector = [
         (keys.a ? -10 : 0) + (keys.d ? 10 : 0),
@@ -164,7 +175,8 @@ export class OwnPlayer extends Player {
         }
       }
     }
-
+    this.x += this.speedVector[0];
+    this.y += this.speedVector[1];
     this.draw(this, context);
   }
   changeSkin(skin: Skins): void {
@@ -189,9 +201,10 @@ export class OtherPlayer extends Player {
     rotation: number,
     health: number,
     id: string,
-    name: string
+    name: string,
+    swordopacity: number
   ) {
-    super(x, y, size, skin, swordskin, rotation, health, name);
+    super(x, y, size, skin, swordskin, rotation, health, name, swordopacity);
     this.id = id;
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
@@ -206,5 +219,6 @@ export class OtherPlayer extends Player {
     this.health = player.health;
     this.rotation = player.rotation;
     this.name = player.name;
+    this.swordopacity = player.swordopacity;
   }
 }

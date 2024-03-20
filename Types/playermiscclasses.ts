@@ -15,6 +15,7 @@ export class PlayerHeader {
     this.owner = owner;
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
+    const scale = this.owner.size / player.size;
     context.save();
     Thing.doTranslate(player, context, this.owner, this.owner.size);
     //How heights are calculated:
@@ -23,23 +24,27 @@ export class PlayerHeader {
     context.strokeStyle = "none";
     context.fillStyle = "red";
     context.fillRect(
-      -96 / player.size,
-      (-this.owner.width / 2 - 10 - 32) / player.size,
-      192 / player.size,
-      32 / player.size
+      -96 * scale,
+      (-this.owner.width / 2 - 10 - 32) * scale,
+      192 * scale,
+      32 * scale
     );
     context.fillStyle = "green";
     context.fillRect(
-      -96 / player.size,
-      (-this.owner.width / 2 - 10 - 32) / player.size,
-      ((this.owner.health / (this.owner.size * 100)) * 192) / player.size,
-      32 / player.size
+      -96 * scale,
+      (-this.owner.width / 2 - 10 - 32) * scale,
+      (this.owner.health / (this.owner.size * 100)) * 192 * scale,
+      32 * scale
     );
     context.textAlign = "center";
     context.textBaseline = "bottom";
     context.fillStyle = "black";
-    context.font = `${32 / player.width}px Arial`;
-    context.fillText;
+    context.font = `${Math.round(32 * scale)}px Arial`;
+    context.fillText(
+      player.name,
+      0,
+      (-this.owner.width / 2 - 10 - 32 - 10) * scale
+    );
     context.restore();
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D) {
@@ -79,6 +84,7 @@ export class Sword {
     }
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
+    const scale = this.owner.size / player.size;
     context.save();
     context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
     Thing.doTranslate(player, context, this.owner, this.owner.size);
@@ -91,17 +97,17 @@ export class Sword {
         skinpos[1] * 64,
         64,
         64,
-        (-this.owner.width - 32) / player.width,
-        -32 / player.width,
-        64 / player.width,
-        64 / player.width
+        (-this.owner.width - 32) * scale,
+        -32 * scale,
+        64 * scale,
+        64 * scale
       );
     } else {
       context.fillRect(
-        (-this.owner.width - 32) / player.width,
-        -32 / player.width,
-        64 / player.width,
-        64 / player.width
+        (-this.owner.width - 32) * scale,
+        -32 * scale,
+        64 * scale,
+        64 * scale
       );
     }
     if (this.swordimg) {
@@ -112,17 +118,17 @@ export class Sword {
         skinpos[1] * 64,
         256,
         64,
-        (-this.owner.width - 128) / player.width,
-        -32 / player.width,
-        256 / player.width,
-        64 / player.width
+        (-this.owner.width - 128) * scale,
+        -32 * scale,
+        256 * scale,
+        64 * scale
       );
     } else {
       context.fillRect(
-        (-this.owner.width - 128) / player.width,
-        -32 / player.width,
-        256 / player.width,
-        64 / player.width
+        (-this.owner.width - 128) * scale,
+        -32 * scale,
+        256 * scale,
+        64 * scale
       );
     }
     context.restore();
