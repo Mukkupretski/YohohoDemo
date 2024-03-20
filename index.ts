@@ -1,4 +1,4 @@
-//Imports
+//#region Imports
 
 import { Socket, io } from "socket.io-client";
 import {
@@ -8,7 +8,9 @@ import {
   OtherPlayer,
 } from "./Types/eventtypes";
 
-//Preventing movement during text input editing
+//#endregion
+
+//#region Preventing movement during text input editing
 
 const name: HTMLInputElement = document.querySelector("#name")!;
 
@@ -25,7 +27,9 @@ document
     });
   });
 
-//Initializing player
+//#endregion
+
+//#region Initializing player
 
 let player: Player = { name: "", x: 0, y: 0, health: 100, size: 1 };
 let otherPlayers: OtherPlayer[] = [];
@@ -36,7 +40,9 @@ name.addEventListener("change", () => {
   socket.emit("playerChange", player);
 });
 
-//Choosing connection from devtunnel (port forward) and localhost
+//#endregion
+
+//#region Choosing connection from devtunnel (port forward) and localhost
 
 const connect: HTMLInputElement = document.querySelector("#connect")!;
 
@@ -62,14 +68,18 @@ function changeServer(e: Event) {
 
 connect.addEventListener("change", changeServer);
 
-//Connecting
+//#endregion
+
+//#region Connecting
 
 const connectionstring = localStorage.getItem("connection") as string;
 
 const socket: Socket<ServerToClientEvent, ClientToServerEvents> =
   io(connectionstring);
 
-//Socket events
+//#endregion
+
+//#region Socket events
 
 socket.on("playerChange", (otherPlayer) => {
   const index = otherPlayers.findIndex((elem) => elem.id === otherPlayer.id);
@@ -86,7 +96,9 @@ socket.on("playerLeft", (id) => {
   });
 });
 
-//initializing canvas
+//#endregion
+
+//#region initializing canvas
 
 const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
 const game = canvas.getContext("2d")!;
@@ -105,7 +117,9 @@ window.addEventListener("resize", () => {
   game.font = "16px Arial";
 });
 
-//Game rendering
+//#endregion
+
+//#region Game rendering
 
 function drawPlayer() {
   game.fillRect(player.x, player.y, 100, 100);
@@ -131,7 +145,9 @@ function renderGame() {
   requestAnimationFrame(renderGame);
 }
 
-//Player movement
+//#endregion
+
+//#region Player movement
 
 window.addEventListener("keydown", (e) => {
   if (focused) return;
@@ -162,5 +178,6 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-//Renders game
+//#endregion
+
 renderGame();
