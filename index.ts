@@ -6,7 +6,7 @@ import {
   ClientToServerEvents,
   Player,
   OtherPlayer,
-} from "./Types/eventtypes";
+} from "./Utils/eventtypes";
 
 //#endregion
 
