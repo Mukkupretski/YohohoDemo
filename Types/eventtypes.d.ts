@@ -1,18 +1,14 @@
-export interface Player {
-  x: number;
-  y: number;
-  health: number;
-  size: number;
-  name: string;
-}
-interface OtherPlayer extends Player {
-  id: string;
-}
+import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
 
 export type ServerToClientEvent = {
   playerChange: (player: OtherPlayer) => void;
-  playerLeft: (id) => void;
+  playerDamage: (damage: number) => void;
+  playerJoined: (player: OtherPlayer) => void;
+  playerLeft: (id: string) => void;
 };
 export type ClientToServerEvents = {
-  playerChange: (player: Player) => void;
+  playerJoined: (player: OwnPlayer) => void;
+  playerChange: (player: OwnPlayer) => void;
+  swingSword: (player: OwnPlayer) => void;
+  dash: (player: OwnPlayer, dashStart: [number, number]) => void;
 };
