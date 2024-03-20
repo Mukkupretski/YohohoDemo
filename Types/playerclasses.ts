@@ -36,7 +36,7 @@ export abstract class Player {
     this.speedVector = [0, 0];
     this.name = name;
     const skinImage = document.createElement("img");
-    skinImage.src = "Images/skinsheet.png";
+    skinImage.src = "../Images/skinsheet.png";
     skinImage.onload = () => {
       this.image = skinImage;
     };
@@ -45,7 +45,7 @@ export abstract class Player {
 
   changeSkin(skin: Skins): void {
     const skinImage = document.createElement("img");
-    skinImage.src = "Images/skinsheet.png";
+    skinImage.src = "../Images/skinsheet.png";
     skinImage.onload = () => {
       this.image = skinImage;
     };
