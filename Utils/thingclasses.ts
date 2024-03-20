@@ -1,5 +1,6 @@
 import { OwnPlayer, Player } from "./playerclasses";
 import { Obj } from "./playermiscclasses";
+import { GRASSPATCH_CENTER, MAP_COLOR, NO_RENDER_COLOR } from "./constants";
 
 export abstract class Thing {
   image: CanvasImageSource | undefined;
@@ -27,16 +28,20 @@ export abstract class Thing {
     this.y = y;
     this.rotation = rotation;
   }
-  isInscreen(player: OwnPlayer, canvas: HTMLCanvasElement): boolean {
+  static isInscreen(
+    player: OwnPlayer,
+    canvas: HTMLCanvasElement,
+    obj: Player | Thing | Obj
+  ): boolean {
     return (
-      Math.abs(player.x - this.x) - this.width / 2 <
+      Math.abs(player.x - obj.x) - obj.width / 2 <
         (player.size * canvas.width) / 2 &&
-      Math.abs(player.y - this.y) - this.height / 2 <
+      Math.abs(player.y - obj.y) - obj.height / 2 <
         (player.size * canvas.height) / 2
     );
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
-    if (!this.isInscreen(player, context.canvas)) return;
+    if (!Thing.isInscreen(player, context.canvas, this)) return;
     context.save();
     context.rotate(((-2 * Math.PI) / 180) * this.rotation);
     Thing.doTranslate(player, context, this);
@@ -49,7 +54,7 @@ export abstract class Thing {
         this.height / player.size
       );
     } else {
-      context.fillStyle = "black";
+      context.fillStyle = NO_RENDER_COLOR;
       context.fillRect(
         -this.width / player.size / 2,
         -this.height / player.size / 2,
@@ -74,19 +79,16 @@ export abstract class Thing {
     //3. Move respectively to the own player's position (scaled by scale)
     //4. Now the object would be at correct place if scale was 1 but else the top corner is offset by width*(1-scale)/2 so we fix that (same with height)
     //5. The square is rendered at ((-width*scale)/2,(-height*scale)/2) for rotation so we fix that offset
+    //Note that 2. and 5. cancel each other
     context.translate(
       //X
-      context.canvas.width / 2 -
-        (obj.width / 2) * scale +
+      context.canvas.width / 2 +
         (obj.width - obj.width * scale) / 2 +
-        (obj.x - player.x) * scale +
-        (obj.width * scale) / 2,
+        (obj.x - player.x) * scale,
       //Y
-      context.canvas.height / 2 -
-        (obj.height / 2) * scale +
+      context.canvas.height / 2 +
         (obj.height - obj.height * scale) / 2 +
-        (obj.y - player.y) * scale +
-        (obj.height * scale) / 2
+        (obj.y - player.y) * scale
     );
   }
 }
@@ -181,5 +183,31 @@ export class GrassPatch {
     this.x = x;
     this.y = y;
     this.r = r;
+  }
+  draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
+    context.save();
+    const x0 = context.canvas.width / 2 + (this.x - player.x) / player.size;
+    const y0 = context.canvas.height / 2 + (this.y - player.y) / player.size;
+    const r0 = this.r / player.size;
+    const grd = context.createRadialGradient(x0, y0, 0, x0, y0, r0);
+    grd.addColorStop(0, MAP_COLOR);
+    grd.addColorStop(1, GRASSPATCH_CENTER);
+    context.fillStyle = grd;
+    context.beginPath();
+    context.arc(x0, y0, r0, 0, 2 * Math.PI, false);
+    context.fill();
+    context.restore();
+  }
+  update(player: OwnPlayer, context: CanvasRenderingContext2D) {
+    if (
+      !Thing.isInscreen(player, context.canvas, {
+        x: this.x,
+        y: this.y,
+        width: this.r,
+        height: this.r,
+      })
+    ) {
+      this.draw(player, context);
+    }
   }
 }

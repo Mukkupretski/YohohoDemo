@@ -1,6 +1,7 @@
 import { Swords, getSkinPos, getSwordPos } from "./enums";
 import { OwnPlayer, Player } from "./playerclasses";
 import { Thing } from "./thingclasses";
+import { NO_RENDER_COLOR } from "./constants";
 
 export type Obj = {
   width: number;
@@ -38,7 +39,7 @@ export class PlayerHeader {
     );
     context.textAlign = "center";
     context.textBaseline = "bottom";
-    context.fillStyle = "black";
+    context.fillStyle = NO_RENDER_COLOR;
     context.font = `${Math.round(32 * scale)}px Arial`;
     context.fillText(
       player.name,
@@ -88,7 +89,7 @@ export class Sword {
     context.save();
     context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
     Thing.doTranslate(player, context, this.owner, this.owner.size);
-    context.fillStyle = "black";
+    context.fillStyle = NO_RENDER_COLOR;
     if (this.handimg) {
       const skinpos = getSkinPos(this.owner.skin);
       context.drawImage(

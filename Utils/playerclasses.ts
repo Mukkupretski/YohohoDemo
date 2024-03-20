@@ -1,5 +1,6 @@
+import { NO_RENDER_COLOR } from "./constants";
 import { Skins, Swords, getSkinPos } from "./enums";
-import { Sword } from "./playermiscclasses";
+import { PlayerHeader, Sword } from "./playermiscclasses";
 import { Thing } from "./thingclasses";
 
 export abstract class Player {
@@ -16,6 +17,7 @@ export abstract class Player {
   skin: Skins;
   swordskin: Swords;
   sword: Sword;
+  playerheader: PlayerHeader;
   swordopacity: number;
   constructor(
     x: number,
@@ -35,6 +37,7 @@ export abstract class Player {
     this.height = 256;
     this.skin = skin;
     this.sword = new Sword(this);
+    this.playerheader = new PlayerHeader(this);
     this.rotation = rotation;
     this.swordskin = swordskin;
     this.health = health;
@@ -48,8 +51,12 @@ export abstract class Player {
     };
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
+    if (!Thing.isInscreen(player, context.canvas, this)) return;
     const scale = this.size / player.size;
+    //Draw sword and header
     this.sword.update(player, context);
+    this.playerheader.update(player, context);
+    //Do actual drawing
     context.save();
     context.rotate((-this.rotation / 180) * Math.PI);
     Thing.doTranslate(player, context, this, this.size);
@@ -67,6 +74,7 @@ export abstract class Player {
         this.height * scale
       );
     } else {
+      context.fillStyle = NO_RENDER_COLOR;
       context.fillRect(
         (-this.width / 2) * scale,
         (-this.width / 2) * scale,
