@@ -52,8 +52,8 @@ function renderGame() {
       : 0,
   });
   keys.spacebartime = 0;
-  socket.emit("playerChange", ownPlayer);
   otherPlayers.forEach((p) => p.update(ownPlayer, game));
+  socket.emit("playerChange", ownPlayer);
   requestAnimationFrame(renderGame);
 }
 
@@ -131,10 +131,10 @@ window.addEventListener("keyup", (e) => {
 
 socket.on("connect", () => {
   socket.emit("playerJoined", ownPlayer);
-  renderGame();
 });
 socket.on("mapInit", (otherPlayers) => {
   otherPlayers = otherPlayers;
+  renderGame();
 });
 
 socket.on("playerJoined", (otherPlayer) => {
@@ -142,7 +142,7 @@ socket.on("playerJoined", (otherPlayer) => {
 });
 
 socket.on("playerChange", (otherPlayer) => {
-  otherPlayers.find((p) => p.id === otherPlayer.id)?.setProperties(otherPlayer);
+  otherPlayers.find((p) => p.id === otherPlayer.id)!.setProperties(otherPlayer);
 });
 
 socket.on("playerLeft", (id) => {
