@@ -1,6 +1,6 @@
+*.js
 /node_modules
 /.env
 /yarn.lock
 /tsconfig.json
 /package.json
-*.js
