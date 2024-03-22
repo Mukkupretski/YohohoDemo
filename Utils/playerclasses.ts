@@ -197,6 +197,20 @@ export class OwnPlayer extends Player {
     this.size += amount / 10;
     this.health = 100 * this.size;
   }
+  getOtherPlayer(id: string): OtherPlayer {
+    return new OtherPlayer(
+      this.x,
+      this.y,
+      this.size,
+      this.skin,
+      this.swordskin,
+      this.rotation,
+      this.health,
+      id,
+      this.name,
+      this.swordopacity
+    );
+  }
 }
 export class OtherPlayer extends Player {
   id: string;
