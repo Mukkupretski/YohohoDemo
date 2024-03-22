@@ -1,6 +1,11 @@
 import { OwnPlayer, Player } from "./playerclasses";
 import { Obj } from "./playermiscclasses";
-import { GRASSPATCH_CENTER, MAP_COLOR, NO_RENDER_COLOR } from "./constants";
+import {
+  GRASSPATCH_CENTER,
+  IMAGE_PATH,
+  MAP_COLOR,
+  NO_RENDER_COLOR,
+} from "./constants";
 
 export abstract class Thing {
   image: CanvasImageSource | undefined;
@@ -116,36 +121,36 @@ export abstract class Interactable extends Thing {
 
 export class Tree extends Thing {
   constructor(x: number, y: number, rotation: number) {
-    super("../Images/tree.png", 384, 384, x, y, rotation);
+    super(`${IMAGE_PATH}/tree.png`, 384, 384, x, y, rotation);
   }
 }
 export class Bush extends Thing {
   constructor(x: number, y: number, rotation: number) {
-    super("../Images/bush.png", 128, 128, x, y, rotation);
+    super(`${IMAGE_PATH}/bush.png`, 128, 128, x, y, rotation);
   }
 }
 export class Skull extends Thing {
   constructor(x: number, y: number, rotation: number) {
-    super("../Images/skull.png", 256, 256, x, y, rotation);
+    super(`${IMAGE_PATH}/skull.png`, 256, 256, x, y, rotation);
   }
 }
 export class Treasure extends Thing {
   constructor(x: number, y: number, rotation: number) {
-    super("../Images/treasure.png", 256, 128, x, y, rotation);
+    super(`${IMAGE_PATH}/treasure.png`, 256, 128, x, y, rotation);
   }
 }
 export class Hut extends Interactable {
   floorimg: CanvasImageSource | undefined;
   hutimg: CanvasImageSource | undefined;
   constructor(x: number, y: number, rotation: number) {
-    super("../Images/hut.png", x, y, 512, 512, rotation);
+    super(`${IMAGE_PATH}/hut.png`, x, y, 512, 512, rotation);
     const floorelem = document.createElement("img");
-    floorelem.src = "../Images/hutfloor.png";
+    floorelem.src = `${IMAGE_PATH}/hutfloor.png`;
     floorelem.onload = () => {
       this.floorimg = floorelem;
     };
     const hutelem = document.createElement("img");
-    hutelem.src = "../Images/hut.png";
+    hutelem.src = `${IMAGE_PATH}/hut.png`;
     hutelem.onload = () => {
       this.hutimg = hutelem;
     };
@@ -162,7 +167,7 @@ export class Hut extends Interactable {
 export class Coin extends Interactable {
   collected: boolean;
   constructor(x: number, y: number, rotation: number) {
-    super("../Images/coin.png", x, y, 32, 32, rotation);
+    super(`${IMAGE_PATH}/coin.png`, x, y, 32, 32, rotation);
     this.collected = false;
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {

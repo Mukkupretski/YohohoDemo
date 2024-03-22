@@ -1,4 +1,4 @@
-import { NO_RENDER_COLOR } from "./constants";
+import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 import { Skins, Swords, getSkinPos } from "./enums";
 import { PlayerHeader, Sword } from "./playermiscclasses";
 import { Thing } from "./thingclasses";
@@ -45,7 +45,7 @@ export abstract class Player {
     this.name = name;
     this.swordopacity = swordopacity;
     const skinImage = document.createElement("img");
-    skinImage.src = "../Images/skinsheet.png";
+    skinImage.src = `${IMAGE_PATH}/skinsheet.png`;
     skinImage.onload = () => {
       this.image = skinImage;
     };

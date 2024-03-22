@@ -1,7 +1,7 @@
 import { Swords, getSkinPos, getSwordPos } from "./enums";
 import { OwnPlayer, Player } from "./playerclasses";
 import { Thing } from "./thingclasses";
-import { NO_RENDER_COLOR } from "./constants";
+import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 
 export type Obj = {
   width: number;
@@ -65,12 +65,12 @@ export class Sword {
     this.direction = "static";
     this.owner = owner;
     const handel = document.createElement("img");
-    handel.src = "../Images/handsheet.png";
+    handel.src = `${IMAGE_PATH}/handsheet.png`;
     handel.onload = () => {
       this.handimg = handel;
     };
     const swordel = document.createElement("img");
-    swordel.src = "../Images/swordsheet.png";
+    swordel.src = `${IMAGE_PATH}/swordsheet.png`;
     swordel.onload = () => {
       this.swordimg = swordel;
     };
