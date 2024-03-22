@@ -1,10 +1,11 @@
 export enum Skins {
   AMOGUS,
   NORMAL,
+  PYTHAGORAS,
 }
 
 export enum Swords {
-  DEFAULT,
+  PYTHAGORAS,
 }
 
 export function getSkinPos(skin: Skins): [number, number] {

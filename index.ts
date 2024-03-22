@@ -3,6 +3,8 @@
 import { socket } from "./socket";
 import isInInput from "./isInInput";
 import { ServerToClientEvent, ClientToServerEvents } from "./Utils/eventtypes";
+import { OwnPlayer } from "./Utils/playerclasses";
+import { Skins } from "./Utils/enums";
 
 //#endregion
 
@@ -21,6 +23,10 @@ window.addEventListener("resize", () => {
 //#endregion
 
 //#region Game rendering
+
+//#region initializing player
+
+const ownPlayer: OwnPlayer = new OwnPlayer(0, 0, Skins.AMOGUS, Swords);
 
 function renderGame() {
   clearCanvas();
