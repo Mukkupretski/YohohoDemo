@@ -3,3 +3,4 @@
 /yarn.lock
 /tsconfig.json
 /package.json
+*.js
