@@ -53,7 +53,7 @@ function renderGame() {
   });
   keys.spacebartime = 0;
   otherPlayers.forEach((p) => p.update(ownPlayer, game));
-  socket.emit("playerChange", ownPlayer);
+  socket.emit("playerChange", ownPlayer.serialize());
   requestAnimationFrame(renderGame);
 }
 
@@ -128,17 +128,16 @@ window.addEventListener("keyup", (e) => {
 //#endregion
 
 //#region Socket events
-console.log(new Date().getTime());
-socket.emit("playerJoined", ownPlayer);
 
-socket.on("mapInit", (otherPlayers) => {
-  console.log("here");
-  otherPlayers = otherPlayers;
+socket.emit("playerJoined", ownPlayer.serialize());
+
+socket.on("mapInit", (others) => {
+  otherPlayers = others.map((other) => new OtherPlayer(other));
   renderGame();
 });
 
 socket.on("playerJoined", (otherPlayer) => {
-  otherPlayers.push(otherPlayer);
+  otherPlayers.push(new OtherPlayer(otherPlayer));
 });
 
 socket.on("playerChange", (otherPlayer) => {
