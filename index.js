@@ -1,122 +1,112 @@
 "use strict";
-//Imports
+//#region Imports
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var socket_io_client_1 = require("socket.io-client");
-//Preventing movement during text input editing
-var name = document.querySelector("#name");
-var focused = false;
-document
-    .querySelectorAll('input[type="text"]')
-    .forEach(function (el) {
-    el.addEventListener("focusin", function () {
-        focused = true;
-    });
-    el.addEventListener("focusout", function () {
-        focused = false;
-    });
-});
-//Initializing player
-var player = { name: "", x: 0, y: 0, health: 100, size: 1 };
-var otherPlayers = [];
-name.addEventListener("change", function () {
-    name.blur();
-    player.name = name.value;
-    socket.emit("playerChange", player);
-});
-//Choosing connection from devtunnel (port forward) and localhost
-var connect = document.querySelector("#connect");
-if (localStorage.getItem("connection") == "http://localhost:3000") {
-    connect.checked = true;
-}
-else if (localStorage.getItem("connetion") == null) {
-    localStorage.setItem("connection", "https://w8b2j173-3000.euw.devtunnels.ms/");
-}
-function changeServer(e) {
-    localStorage.setItem("connection", connect.checked
-        ? "http://localhost:3000"
-        : "https://w8b2j173-3000.euw.devtunnels.ms/");
-    connect.removeEventListener("change", changeServer);
-    window.location.reload();
-}
-connect.addEventListener("change", changeServer);
-//Connecting
-var connectionstring = localStorage.getItem("connection");
-var socket = (0, socket_io_client_1.io)(connectionstring);
-//Socket events
-socket.on("playerChange", function (otherPlayer) {
-    var index = otherPlayers.findIndex(function (elem) { return elem.id === otherPlayer.id; });
-    if (index === -1) {
-        otherPlayers.push(otherPlayer);
-        return;
-    }
-    otherPlayers[index] = otherPlayer;
-});
-socket.on("playerLeft", function (id) {
-    otherPlayers = otherPlayers.filter(function (elem) {
-        return elem.id != id;
-    });
-});
-//initializing canvas
-var canvas = document.querySelector("canvas");
-var game = canvas.getContext("2d");
+const socket_1 = require("./socket");
+const isInInput_1 = __importDefault(require("./isInInput"));
+const playerclasses_1 = require("./Utils/playerclasses");
+const enums_1 = require("./Utils/enums");
+//#endregion
+//#region initializing canvas
+const canvas = document.querySelector("canvas");
+const game = canvas.getContext("2d");
 canvas.width = window.innerWidth;
-canvas.height = 0.9 * window.innerHeight;
-game.fillStyle = "gray";
-game.font = "16px Arial";
-game.fillRect(0, 0, 100, 100);
-window.addEventListener("resize", function () {
+window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = 0.9 * window.innerHeight;
-    game.fillStyle = "gray";
-    game.font = "16px Arial";
 });
-//Game rendering
-function drawPlayer() {
-    game.fillRect(player.x, player.y, 100, 100);
-    game.fillText(player.name, player.x, player.y);
-}
 function clearCanvas() {
     game.clearRect(0, 0, canvas.width, canvas.height);
 }
-function renderOtherPlayers() {
-    otherPlayers.forEach(function (p) {
-        game.fillRect(p.x, p.y, 100, 100);
-        game.fillText(p.name, p.x, p.y);
-    });
-}
+//#endregion
+//#region Game rendering
+//#region initializing players
+const ownPlayer = new playerclasses_1.OwnPlayer(0, 0, enums_1.Skins.AMOGUS, enums_1.Swords.PYTHAGORAS);
+let otherPlayers = [];
+//#endregion
+//#region Drawing canvas
 function renderGame() {
     clearCanvas();
-    drawPlayer();
-    renderOtherPlayers();
-    socket.emit("playerChange", player);
+    ownPlayer.update(game, Object.assign(Object.assign({}, keys), { spacebarhold: keys.spacebardown
+            ? new Date().getTime() - keys.spacebardown
+            : 0 }));
+    keys.spacebartime = 0;
+    socket_1.socket.emit("playerChange", ownPlayer);
+    otherPlayers.forEach((p) => p.update(ownPlayer, game));
     requestAnimationFrame(renderGame);
 }
-//Player movement
-window.addEventListener("keydown", function (e) {
-    if (focused)
+//#endregion
+//#region Player movement
+const keys = { w: false, d: false, s: false, a: false, spacebartime: 0 };
+window.addEventListener("keydown", (e) => {
+    if ((0, isInInput_1.default)())
         return;
     switch (e.key) {
         case "a":
-            if (player.x > 0) {
-                player.x -= 10;
-            }
+            keys.a = true;
             break;
         case "d":
-            if (player.x < canvas.width - 100) {
-                player.x += 10;
-            }
+            keys.d = true;
             break;
         case "w":
-            if (player.y > 0) {
-                player.y -= 10;
-            }
+            keys.w = true;
             break;
         case "s":
-            if (player.y < canvas.height - 100) {
-                player.y += 10;
-            }
+            keys.s = true;
             break;
+        case " ":
+            if (!ownPlayer.isAttacking && ownPlayer.dashAcc == 0) {
+                keys.spacebardown = new Date().getTime();
+            }
     }
 });
-//Renders game
-renderGame();
+window.addEventListener("keyup", (e) => {
+    if ((0, isInInput_1.default)())
+        return;
+    switch (e.key) {
+        case "a":
+            keys.a = false;
+            break;
+        case "d":
+            keys.d = false;
+            break;
+        case "w":
+            keys.w = false;
+            break;
+        case "s":
+            keys.s = false;
+            break;
+        case " ":
+            if (!ownPlayer.isAttacking &&
+                ownPlayer.dashAcc == 0 &&
+                keys.spacebardown) {
+                keys.spacebartime = new Date().getTime() - keys.spacebardown;
+                keys.spacebardown = undefined;
+            }
+    }
+});
+//#endregion
+//#region Socket events
+socket_1.socket.on("connect", () => {
+    socket_1.socket.emit("playerJoined", ownPlayer);
+    renderGame();
+});
+socket_1.socket.on("mapInit", (otherPlayers) => {
+    otherPlayers = otherPlayers;
+});
+socket_1.socket.on("playerJoined", (otherPlayer) => {
+    otherPlayers.push(otherPlayer);
+});
+socket_1.socket.on("playerChange", (otherPlayer) => {
+    var _a;
+    (_a = otherPlayers.find((p) => p.id === otherPlayer.id)) === null || _a === void 0 ? void 0 : _a.setProperties(otherPlayer);
+});
+socket_1.socket.on("playerLeft", (id) => {
+    otherPlayers = otherPlayers.filter((p) => p.id !== id);
+});
+socket_1.socket.on("disconnect", () => {
+    socket_1.socket.emit("playerLeft");
+});
+//#endregion
