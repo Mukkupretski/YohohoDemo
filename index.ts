@@ -128,11 +128,11 @@ window.addEventListener("keyup", (e) => {
 //#endregion
 
 //#region Socket events
+console.log(new Date().getTime());
+socket.emit("playerJoined", ownPlayer);
 
-socket.on("connect", () => {
-  socket.emit("playerJoined", ownPlayer);
-});
 socket.on("mapInit", (otherPlayers) => {
+  console.log("here");
   otherPlayers = otherPlayers;
   renderGame();
 });

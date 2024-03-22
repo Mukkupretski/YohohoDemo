@@ -2,6 +2,7 @@ import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 import { Skins, Swords, getSkinPos } from "./enums";
 import { PlayerHeader, Sword } from "./playermiscclasses";
 import { Thing } from "./thingclasses";
+import { SerializedOtherPlayer, SerializedPlayer } from "./serialtypes";
 
 export abstract class Player {
   rotation: number;
@@ -13,7 +14,6 @@ export abstract class Player {
   health: number;
   height: number;
   image: CanvasImageSource | undefined;
-  speedVector: [number, number];
   skin: Skins;
   swordskin: Swords;
   sword: Sword;
@@ -41,7 +41,7 @@ export abstract class Player {
     this.rotation = rotation;
     this.swordskin = swordskin;
     this.health = health;
-    this.speedVector = [0, 0];
+
     this.name = name;
     this.swordopacity = swordopacity;
     const skinImage = document.createElement("img");
@@ -91,10 +91,12 @@ export class OwnPlayer extends Player {
   coins: number;
   dashAcc: number;
   isAttacking: boolean;
+  speedVector: [number, number];
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, swordskin, 0, 100, "", 0);
     this.targetrotation = 0;
     this.coins = 0;
+    this.speedVector = [0, 0];
     this.dashAcc = 0;
     this.isAttacking = false;
   }
@@ -197,42 +199,53 @@ export class OwnPlayer extends Player {
     this.size += amount / 10;
     this.health = 100 * this.size;
   }
-  getOtherPlayer(id: string): OtherPlayer {
-    return new OtherPlayer(
-      this.x,
-      this.y,
-      this.size,
-      this.skin,
-      this.swordskin,
-      this.rotation,
-      this.health,
-      id,
-      this.name,
-      this.swordopacity
-    );
+
+  serialize(): SerializedPlayer {
+    return {
+      health: this.health,
+      x: this.x,
+      y: this.y,
+      name: this.name,
+      size: this.size,
+      skin: this.skin,
+      swordskin: this.swordskin,
+      swordopacity: this.swordopacity,
+      rotation: this.rotation,
+    };
   }
 }
 export class OtherPlayer extends Player {
   id: string;
-  constructor(
-    x: number,
-    y: number,
-    size: number,
-    skin: Skins,
-    swordskin: Swords,
-    rotation: number,
-    health: number,
-    id: string,
-    name: string,
-    swordopacity: number
-  ) {
+  constructor({
+    x,
+    y,
+    size,
+    skin,
+    swordopacity,
+    swordskin,
+    rotation,
+    health,
+    id,
+    name,
+  }: {
+    x: number;
+    y: number;
+    size: number;
+    skin: Skins;
+    swordskin: Swords;
+    rotation: number;
+    health: number;
+    id: string;
+    name: string;
+    swordopacity: number;
+  }) {
     super(x, y, size, skin, swordskin, rotation, health, name, swordopacity);
     this.id = id;
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     this.draw(player, context);
   }
-  setProperties(player: OtherPlayer) {
+  setProperties(player: SerializedOtherPlayer) {
     this.x = player.x;
     this.y = player.y;
     this.size = player.size;

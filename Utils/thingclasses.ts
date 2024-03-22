@@ -6,6 +6,7 @@ import {
   MAP_COLOR,
   NO_RENDER_COLOR,
 } from "./constants";
+import { SerializedThing } from "./serialtypes";
 
 export abstract class Thing {
   image: CanvasImageSource | undefined;
@@ -95,6 +96,9 @@ export abstract class Thing {
         (obj.height - obj.height * scale) / 2 +
         (obj.y - player.y) * scale
     );
+  }
+  static getSerializedThing(thing: Thing): SerializedThing {
+    return { x: thing.x, y: thing.y, rotation: thing.rotation };
   }
 }
 export abstract class Interactable extends Thing {
