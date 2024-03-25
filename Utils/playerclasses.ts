@@ -58,16 +58,19 @@ export abstract class Player {
     this.playerheader.update(player, context);
     //Do actual drawing
     context.save();
-    context.rotate((-this.rotation / 180) * Math.PI);
+
     Thing.doTranslate(player, context, this, this.size);
+    context.rotate((-this.rotation / 180) * Math.PI);
     if (this.image) {
       const skinpos = getSkinPos(this.skin);
+      console.log(256 * skinpos[0], 256 * skinpos[1]);
       context.drawImage(
         this.image,
         256 * skinpos[0],
         256 * skinpos[1],
         256,
         256,
+
         (-this.width / 2) * scale,
         (-this.width / 2) * scale,
         this.width * scale,
@@ -112,9 +115,10 @@ export class OwnPlayer extends Player {
     }
   ): void {
     //Check if spacebar was pressed and there is no current spacebar action
-    if (keys.spacebartime != 0 && !this.isAttacking && this.dashAcc != 0) {
+
+    if (keys.spacebartime != 0 && !this.isAttacking && this.dashAcc == 0) {
       //Swing attack
-      if (keys.spacebartime < 1) {
+      if (keys.spacebartime < 1000) {
         this.isAttacking = true;
         this.sword.swing();
         //Geometry dash attack
@@ -126,6 +130,7 @@ export class OwnPlayer extends Player {
         ];
         this.dashAcc = power / 8;
       }
+      keys.spacebartime = 0;
     }
     //Slowing dash
     if (this.dashAcc != 0) {
@@ -157,12 +162,14 @@ export class OwnPlayer extends Player {
         (keys.w ? -10 : 0) + (keys.s ? 10 : 0),
       ];
       //Set target rotation (using dot product)
-      this.targetrotation =
-        (180 / Math.PI) *
-        Math.acos(
-          this.speedVector[1] /
-            Math.sqrt(this.speedVector[0] ** 2 + this.speedVector[1] ** 2)
-        );
+      if (this.speedVector[0] ** 2 + this.speedVector[1] ** 2 > 0) {
+        this.targetrotation =
+          (180 / Math.PI) *
+          Math.acos(
+            -this.speedVector[1] /
+              Math.sqrt(this.speedVector[0] ** 2 + this.speedVector[1] ** 2)
+          );
+      }
       if (this.speedVector[0] > 0) {
         this.targetrotation = 360 - this.targetrotation;
       }

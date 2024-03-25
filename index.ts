@@ -5,6 +5,7 @@ import isInInput from "./isInInput";
 import { ServerToClientEvent, ClientToServerEvents } from "./Utils/eventtypes";
 import { OtherPlayer, OwnPlayer } from "./Utils/playerclasses";
 import { Skins, Swords } from "./Utils/enums";
+import { MAP_COLOR } from "./Utils/constants";
 
 //#endregion
 
@@ -14,6 +15,9 @@ const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
 const game = canvas.getContext("2d")!;
 
 canvas.width = window.innerWidth;
+canvas.height = 0.9 * window.innerHeight;
+
+canvas.style.backgroundColor = MAP_COLOR;
 
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
@@ -51,7 +55,7 @@ function renderGame() {
       ? new Date().getTime() - keys.spacebardown
       : 0,
   });
-  keys.spacebartime = 0;
+
   otherPlayers.forEach((p) => p.update(ownPlayer, game));
   socket.emit("playerChange", ownPlayer.serialize());
   requestAnimationFrame(renderGame);
@@ -146,9 +150,6 @@ socket.on("playerChange", (otherPlayer) => {
 
 socket.on("playerLeft", (id) => {
   otherPlayers = otherPlayers.filter((p) => p.id !== id);
-});
-socket.on("disconnect", () => {
-  socket.emit("playerLeft");
 });
 
 //#endregion

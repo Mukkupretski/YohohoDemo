@@ -87,8 +87,8 @@ export class Sword {
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     const scale = this.owner.size / player.size;
     context.save();
-    context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
     Thing.doTranslate(player, context, this.owner, this.owner.size);
+    context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
     context.fillStyle = NO_RENDER_COLOR;
     if (this.handimg) {
       const skinpos = getSkinPos(this.owner.skin);
@@ -98,15 +98,15 @@ export class Sword {
         skinpos[1] * 64,
         64,
         64,
-        (-this.owner.width - 32) * scale,
-        -32 * scale,
+        (-this.owner.width / 2 - 32) * scale,
+        (-32 / 2) * scale,
         64 * scale,
         64 * scale
       );
     } else {
       context.fillRect(
-        (-this.owner.width - 32) * scale,
-        -32 * scale,
+        (-this.owner.width / 2 - 32) * scale,
+        (-32 / 2) * scale,
         64 * scale,
         64 * scale
       );
