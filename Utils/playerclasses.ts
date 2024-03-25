@@ -1,6 +1,6 @@
 import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 import { Skins, Swords, getSkinPos } from "./enums";
-import { PlayerHeader, Sword } from "./playermiscclasses";
+import { OtherSword, OwnSword, PlayerHeader, Sword } from "./playermiscclasses";
 import { Thing } from "./thingclasses";
 import { SerializedOtherPlayer, SerializedPlayer } from "./serialtypes";
 
@@ -15,20 +15,19 @@ export abstract class Player {
   height: number;
   image: CanvasImageSource | undefined;
   skin: Skins;
-  swordskin: Swords;
   sword: Sword;
   playerheader: PlayerHeader;
-  swordopacity: number;
+
   constructor(
     x: number,
     y: number,
     size: number,
     skin: Skins,
-    swordskin: Swords,
     rotation: number,
     health: number,
     name: string,
-    swordopacity: number
+    swordskin: Swords,
+    swordprops?: { swordopacity: number; angle: number }
   ) {
     this.x = x;
     this.y = y;
@@ -36,14 +35,20 @@ export abstract class Player {
     this.width = 256;
     this.height = 256;
     this.skin = skin;
-    this.sword = new Sword(this);
     this.playerheader = new PlayerHeader(this);
     this.rotation = rotation;
-    this.swordskin = swordskin;
     this.health = health;
-
+    if (swordprops) {
+      this.sword = new OtherSword(
+        this as unknown as OtherPlayer,
+        swordskin,
+        swordprops.angle,
+        swordprops.swordopacity
+      );
+    } else {
+      this.sword = new OwnSword(this as unknown as OwnPlayer, swordskin);
+    }
     this.name = name;
-    this.swordopacity = swordopacity;
     const skinImage = document.createElement("img");
     skinImage.src = `${IMAGE_PATH}/skinsheet.png`;
     skinImage.onload = () => {
@@ -96,7 +101,7 @@ export class OwnPlayer extends Player {
   isAttacking: boolean;
   speedVector: [number, number];
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
-    super(x, y, 1, skin, swordskin, 0, 100, "", 0);
+    super(x, y, 1, skin, 0, 100, "", swordskin);
     this.targetrotation = 0;
     this.coins = 0;
     this.speedVector = [0, 0];
@@ -120,7 +125,7 @@ export class OwnPlayer extends Player {
       //Swing attack
       if (keys.spacebartime < 1000) {
         this.isAttacking = true;
-        this.sword.swing();
+        (this.sword as unknown as OwnSword).swing();
         //Geometry dash attack
       } else {
         const power = Math.min(keys.spacebartime / 1000, 3);
@@ -148,14 +153,14 @@ export class OwnPlayer extends Player {
       }
     } else if (this.isAttacking) {
       this.speedVector = [0, 0];
-      if (this.sword.direction === "static") {
+      if ((this.sword as unknown as OwnSword).direction === "static") {
         this.isAttacking = false;
       }
     }
     //Happens only if player is not attacking or geometry dashing
     else {
       //Changing sword opacity
-      this.swordopacity = Math.min(keys.spacebarhold / 1000, 1);
+      this.sword.swordopacity = Math.min(keys.spacebarhold / 1000, 1);
       //Set speed vector by which keys are pressed
       this.speedVector = [
         (keys.a ? -10 : 0) + (keys.d ? 10 : 0),
@@ -196,11 +201,11 @@ export class OwnPlayer extends Player {
     this.y += this.speedVector[1];
     this.draw(this, context);
   }
-  changeSkin(skin: Skins): void {
+  setSkin(skin: Skins): void {
     this.skin = skin;
   }
-  changeSwordSkin(swordskin: Swords): void {
-    this.swordskin = swordskin;
+  setSwordSkin(swordskin: Swords): void {
+    this.sword.swordskin = swordskin;
   }
   grow(amount: number) {
     this.size += amount / 10;
@@ -215,8 +220,7 @@ export class OwnPlayer extends Player {
       name: this.name,
       size: this.size,
       skin: this.skin,
-      swordskin: this.swordskin,
-      swordopacity: this.swordopacity,
+      sword: this.sword.serialize(),
       rotation: this.rotation,
     };
   }
@@ -234,6 +238,7 @@ export class OtherPlayer extends Player {
     health,
     id,
     name,
+    swordangle,
   }: {
     x: number;
     y: number;
@@ -245,8 +250,12 @@ export class OtherPlayer extends Player {
     id: string;
     name: string;
     swordopacity: number;
+    swordangle: number;
   }) {
-    super(x, y, size, skin, swordskin, rotation, health, name, swordopacity);
+    super(x, y, size, skin, rotation, health, name, swordskin, {
+      angle: swordangle,
+      swordopacity: swordopacity,
+    });
     this.id = id;
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
@@ -257,10 +266,9 @@ export class OtherPlayer extends Player {
     this.y = player.y;
     this.size = player.size;
     this.skin = player.skin;
-    this.swordskin = player.swordskin;
     this.health = player.health;
     this.rotation = player.rotation;
     this.name = player.name;
-    this.swordopacity = player.swordopacity;
+    this.sword.setSword(player.sword);
   }
 }

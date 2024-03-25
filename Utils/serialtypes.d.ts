@@ -11,8 +11,12 @@ export interface SerializedPlayer {
   name: string;
   health: number;
   skin: Skins;
-  swordskin: Swords;
+  sword: SerializedSword;
+}
+export interface SerializedSword {
+  angle: number;
   swordopacity: number;
+  swordskin: Swords;
 }
 export interface SerializedOtherPlayer extends SerializedPlayer {
   id: string;

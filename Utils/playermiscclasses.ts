@@ -1,7 +1,8 @@
 import { Swords, getSkinPos, getSwordPos } from "./enums";
-import { OwnPlayer, Player } from "./playerclasses";
+import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
 import { Thing } from "./thingclasses";
 import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
+import { SerializedSword } from "./serialtypes";
 
 export type Obj = {
   width: number;
@@ -58,11 +59,18 @@ export class Sword {
   handimg: CanvasImageSource | undefined;
   swordimg: CanvasImageSource | undefined;
   angle: number;
-  direction: "static" | "left" | "right";
+  swordopacity: number;
+  swordskin: Swords;
 
-  constructor(owner: Player) {
-    this.angle = 30;
-    this.direction = "static";
+  constructor(
+    owner: Player,
+    swordskin: Swords,
+    angle: number,
+    swordopacity: number
+  ) {
+    this.swordskin = swordskin;
+    this.angle = angle;
+    this.swordopacity = swordopacity;
     this.owner = owner;
     const handel = document.createElement("img");
     handel.src = `${IMAGE_PATH}/handsheet.png`;
@@ -76,14 +84,6 @@ export class Sword {
     };
   }
 
-  swing() {
-    switch (this.angle) {
-      case 30:
-        this.direction = "right";
-      case 150:
-        this.direction = "left";
-    }
-  }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     const scale = this.owner.size / player.size;
     context.save();
@@ -112,7 +112,7 @@ export class Sword {
       );
     }
     if (this.swordimg) {
-      const skinpos = getSwordPos(this.owner.swordskin);
+      const skinpos = getSwordPos(this.swordskin);
       context.drawImage(
         this.swordimg,
         skinpos[0] * 256,
@@ -124,7 +124,7 @@ export class Sword {
         256 * scale,
         64 * scale
       );
-      context.globalAlpha = player.swordopacity;
+      context.globalAlpha = this.swordopacity;
       context.drawImage(
         this.swordimg,
         skinpos[0] * 256,
@@ -147,6 +147,40 @@ export class Sword {
     context.restore();
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D) {
+    this.draw(player, context);
+  }
+  serialize(): SerializedSword {
+    return {
+      angle: this.angle,
+      swordopacity: this.swordopacity,
+      swordskin: this.swordskin,
+    };
+  }
+  setSword(sword: SerializedSword): void {
+    this.angle = sword.angle;
+    this.swordopacity = sword.swordopacity;
+    this.swordskin = sword.swordskin;
+  }
+}
+
+export class OwnSword extends Sword {
+  direction: "static" | "left" | "right";
+
+  constructor(owner: OwnPlayer, swordskin: Swords) {
+    super(owner, swordskin, 30, 0);
+    this.direction = "static";
+  }
+
+  swing() {
+    switch (this.angle) {
+      case 30:
+        this.direction = "right";
+      case 150:
+        this.direction = "left";
+    }
+  }
+
+  update(player: OwnPlayer, context: CanvasRenderingContext2D) {
     if (this.direction !== "static") {
       if (this.angle >= 150) {
         this.direction = "static";
@@ -160,5 +194,15 @@ export class Sword {
     }
 
     this.draw(player, context);
+  }
+}
+export class OtherSword extends Sword {
+  constructor(
+    owner: OtherPlayer,
+    swordskin: Swords,
+    angle: number,
+    swordopacity: number
+  ) {
+    super(owner, swordskin, angle, swordopacity);
   }
 }
