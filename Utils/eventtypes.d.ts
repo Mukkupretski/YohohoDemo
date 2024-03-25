@@ -6,12 +6,10 @@ export type ServerToClientEvent = {
   playerJoined: (player: SerializedOtherPlayer) => void;
   mapInit: (player: SerializedOtherPlayer[]) => void;
   playerLeft: (id: string) => void;
-  test2: () => void;
 };
 export type ClientToServerEvents = {
   playerJoined: (player: SerializedPlayer) => void;
   playerChange: (player: SerializedPlayer) => void;
   swingSword: (player: SerializedPlayer) => void;
   dash: (player: SerializedPlayer, dashStart: [number, number]) => void;
-  test: () => void;
 };
