@@ -5,7 +5,7 @@ import isInInput from "./isInInput";
 import { ServerToClientEvent, ClientToServerEvents } from "./Utils/eventtypes";
 import { OtherPlayer, OwnPlayer } from "./Utils/playerclasses";
 import { Skins, Swords } from "./Utils/enums";
-import { MAP_COLOR } from "./Utils/constants";
+import { MAP_COLOR, SCALE } from "./Utils/constants";
 
 //#endregion
 
@@ -13,16 +13,15 @@ import { MAP_COLOR } from "./Utils/constants";
 
 const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
 const game = canvas.getContext("2d")!;
-
-canvas.width = window.innerWidth;
-canvas.height = 0.9 * window.innerHeight;
-
+function initializeCanvas() {
+  canvas.width = window.innerWidth * SCALE;
+  canvas.height = 0.9 * window.innerHeight * SCALE;
+}
 canvas.style.backgroundColor = MAP_COLOR;
 
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = 0.9 * window.innerHeight;
-});
+initializeCanvas();
+
+window.addEventListener("resize", initializeCanvas);
 
 function clearCanvas() {
   game.clearRect(0, 0, canvas.width, canvas.height);
