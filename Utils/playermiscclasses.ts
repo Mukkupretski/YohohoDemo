@@ -1,7 +1,11 @@
 import { Swords, getSkinPos, getSwordPos } from "./enums";
 import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
 import { Thing } from "./thingclasses";
-import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
+import {
+  IMAGE_PATH,
+  NO_RENDER_COLOR,
+  PLAYER_HEADER_PADDING,
+} from "./constants";
 import { SerializedSword } from "./serialtypes";
 
 export type Obj = {
@@ -13,7 +17,11 @@ export type Obj = {
 
 export class PlayerHeader {
   owner: Player;
+  barHeight: number;
+  barwidth: number;
   constructor(owner: Player) {
+    this.barwidth = 192;
+    this.barHeight = 32;
     this.owner = owner;
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
@@ -26,26 +34,30 @@ export class PlayerHeader {
     context.strokeStyle = "none";
     context.fillStyle = "red";
     context.fillRect(
-      -96 * scale,
-      (-this.owner.width / 2 - 10 - 32) * scale,
-      192 * scale,
-      32 * scale
+      (-this.barwidth / 2) * scale,
+      (-this.owner.width / 2 - PLAYER_HEADER_PADDING - this.barHeight) * scale,
+      this.barwidth * scale,
+      this.barHeight * scale
     );
     context.fillStyle = "green";
     context.fillRect(
-      -96 * scale,
-      (-this.owner.width / 2 - 10 - 32) * scale,
-      (this.owner.health / (this.owner.size * 100)) * 192 * scale,
-      32 * scale
+      (-this.barwidth / 2) * scale,
+      (-this.owner.width / 2 - PLAYER_HEADER_PADDING - this.barHeight) * scale,
+      this.barwidth * scale,
+      this.barHeight * scale
     );
     context.textAlign = "center";
     context.textBaseline = "bottom";
     context.fillStyle = NO_RENDER_COLOR;
-    context.font = `${Math.round(32 * scale)}px Arial`;
+    context.font = `${Math.round(PLAYER_HEADER_PADDING * scale)}px Arial`;
     context.fillText(
       player.name,
       0,
-      (-this.owner.width / 2 - 10 - 32 - 10) * scale
+      (-this.owner.width / 2 -
+        PLAYER_HEADER_PADDING -
+        this.barHeight -
+        PLAYER_HEADER_PADDING) *
+        scale
     );
     context.restore();
   }
@@ -61,6 +73,9 @@ export class Sword {
   angle: number;
   swordopacity: number;
   swordskin: Swords;
+  swordwidth: number;
+  swordheight: number;
+  handsize: number;
 
   constructor(
     owner: Player,
@@ -68,6 +83,9 @@ export class Sword {
     angle: number,
     swordopacity: number
   ) {
+    this.swordheight = 64;
+    this.swordwidth = 256;
+    this.handsize = 64;
     this.swordskin = swordskin;
     this.angle = angle;
     this.swordopacity = swordopacity;
@@ -98,17 +116,17 @@ export class Sword {
         skinpos[1] * 64,
         64,
         64,
-        (-this.owner.width / 2 - 32) * scale,
-        (-32 / 2) * scale,
-        64 * scale,
-        64 * scale
+        (-this.owner.width / 2 - this.handsize / 2) * scale,
+        (-this.handsize / 2) * scale,
+        this.handsize * scale,
+        this.handsize * scale
       );
     } else {
       context.fillRect(
-        (-this.owner.width / 2 - 32) * scale,
-        (-32 / 2) * scale,
-        64 * scale,
-        64 * scale
+        (-this.owner.width / 2 - this.handsize / 2) * scale,
+        (-this.handsize / 2) * scale,
+        this.handsize * scale,
+        this.handsize * scale
       );
     }
     if (this.swordimg) {
@@ -119,10 +137,10 @@ export class Sword {
         skinpos[1] * 128,
         256,
         64,
-        (-this.owner.width - 128) * scale,
-        -32 * scale,
-        256 * scale,
-        64 * scale
+        (-this.owner.width - this.swordwidth / 2) * scale,
+        -this.swordheight * scale,
+        this.swordwidth * scale,
+        this.swordheight * scale
       );
       context.globalAlpha = this.swordopacity;
       context.drawImage(
@@ -131,17 +149,17 @@ export class Sword {
         skinpos[1] * 128 + 64,
         256,
         64,
-        (-this.owner.width - 128) * scale,
-        -32 * scale,
-        256 * scale,
-        64 * scale
+        (-this.owner.width - this.swordwidth / 2) * scale,
+        -this.swordheight * scale,
+        this.swordwidth * scale,
+        this.swordheight * scale
       );
     } else {
       context.fillRect(
-        (-this.owner.width - 128) * scale,
-        -32 * scale,
-        256 * scale,
-        64 * scale
+        (-this.owner.width - this.swordwidth / 2) * scale,
+        -this.swordheight * scale,
+        this.swordwidth * scale,
+        this.swordheight * scale
       );
     }
     context.restore();

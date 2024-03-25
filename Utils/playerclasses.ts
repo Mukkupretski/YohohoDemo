@@ -68,7 +68,7 @@ export abstract class Player {
     context.rotate((-this.rotation / 180) * Math.PI);
     if (this.image) {
       const skinpos = getSkinPos(this.skin);
-      console.log(256 * skinpos[0], 256 * skinpos[1]);
+
       context.drawImage(
         this.image,
         256 * skinpos[0],
@@ -117,45 +117,47 @@ export class OwnPlayer extends Player {
       a: boolean;
       spacebartime: number;
       spacebarhold: number;
-    }
+    },
+    spacebarCallback: () => void
   ): void {
     //Check if spacebar was pressed and there is no current spacebar action
 
     if (keys.spacebartime != 0 && !this.isAttacking && this.dashAcc == 0) {
-      //Swing attack
-      if (keys.spacebartime < 1000) {
-        this.isAttacking = true;
-        (this.sword as unknown as OwnSword).swing();
-        //Geometry dash attack
-      } else {
-        const power = Math.min(keys.spacebartime / 1000, 3);
-        this.speedVector = [
-          power * Math.cos(((this.rotation + 90) / 180) * Math.PI),
-          power * Math.sin(((this.rotation + 90) / 180) * Math.PI),
-        ];
-        this.dashAcc = power / 8;
-      }
-      keys.spacebartime = 0;
+      // //Swing attack
+      // if (keys.spacebartime < 1000) {
+      //   this.isAttacking = true;
+      //   (this.sword as unknown as OwnSword).swing();
+      //   //Geometry dash attack
+      // } else {
+      //   const power = Math.min(keys.spacebartime / 1000, 3);
+      //   this.speedVector = [
+      //     power * Math.cos(((this.rotation + 90) / 180) * Math.PI),
+      //     power * Math.sin(((this.rotation + 90) / 180) * Math.PI),
+      //   ];
+      //   this.dashAcc = power / 8;
+      // }
+      console.log("Spacebar time: " + keys.spacebartime);
+      spacebarCallback();
     }
     //Slowing dash
     if (this.dashAcc != 0) {
-      if (this.speedVector[0] < 0)
-        this.speedVector[0] -=
-          this.dashAcc * Math.cos(((this.rotation + 90) / 180) * Math.PI);
-      this.speedVector[1] -=
-        this.dashAcc * Math.sin(((this.rotation + 90) / 180) * Math.PI);
-      //Stopping dash when slow enough
-      if (
-        Math.abs(this.speedVector[0]) <= 1 &&
-        Math.abs(this.speedVector[1]) <= 1
-      ) {
-        this.dashAcc = 0;
-      }
+      // if (this.speedVector[0] < 0)
+      //   this.speedVector[0] -=
+      //     this.dashAcc * Math.cos(((this.rotation + 90) / 180) * Math.PI);
+      // this.speedVector[1] -=
+      //   this.dashAcc * Math.sin(((this.rotation + 90) / 180) * Math.PI);
+      // //Stopping dash when slow enough
+      // if (
+      //   Math.abs(this.speedVector[0]) <= 1 &&
+      //   Math.abs(this.speedVector[1]) <= 1
+      // ) {
+      //   this.dashAcc = 0;
+      // }
     } else if (this.isAttacking) {
-      this.speedVector = [0, 0];
-      if ((this.sword as unknown as OwnSword).direction === "static") {
-        this.isAttacking = false;
-      }
+      // this.speedVector = [0, 0];
+      // if ((this.sword as unknown as OwnSword).direction === "static") {
+      //   this.isAttacking = false;
+      // }
     }
     //Happens only if player is not attacking or geometry dashing
     else {

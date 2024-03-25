@@ -48,12 +48,18 @@ let otherPlayers: OtherPlayer[] = [];
 
 function renderGame() {
   clearCanvas();
-  ownPlayer.update(game, {
-    ...keys,
-    spacebarhold: keys.spacebardown
-      ? new Date().getTime() - keys.spacebardown
-      : 0,
-  });
+  ownPlayer.update(
+    game,
+    {
+      ...keys,
+      spacebarhold: keys.spacebardown
+        ? new Date().getTime() - keys.spacebardown
+        : 0,
+    },
+    () => {
+      keys.spacebartime = 0;
+    }
+  );
 
   otherPlayers.forEach((p) => p.update(ownPlayer, game));
   socket.emit("playerChange", ownPlayer.serialize());
@@ -71,7 +77,13 @@ const keys: {
   a: boolean;
   spacebardown?: number;
   spacebartime: number;
-} = { w: false, d: false, s: false, a: false, spacebartime: 0 };
+} = {
+  w: false,
+  d: false,
+  s: false,
+  a: false,
+  spacebartime: 0,
+};
 
 window.addEventListener("keydown", (e) => {
   if (isInInput()) return;
@@ -89,10 +101,16 @@ window.addEventListener("keydown", (e) => {
       break;
 
     case "s":
+      console.log("Heree");
       keys.s = true;
       break;
     case " ":
-      if (!ownPlayer.isAttacking && ownPlayer.dashAcc == 0) {
+      if (
+        !keys.spacebardown &&
+        !ownPlayer.isAttacking &&
+        ownPlayer.dashAcc == 0
+      ) {
+        console.log("Keydown");
         keys.spacebardown = new Date().getTime();
       }
   }
@@ -122,6 +140,7 @@ window.addEventListener("keyup", (e) => {
         ownPlayer.dashAcc == 0 &&
         keys.spacebardown
       ) {
+        console.log("keyup");
         keys.spacebartime = new Date().getTime() - keys.spacebardown;
         keys.spacebardown = undefined;
       }
