@@ -8,13 +8,13 @@ export let NO_RENDER_COLOR: string = "black";
 
 //#region paths
 
-export const IMAGE_PATH = "/Images";
+export const IMAGE_PATH: string = "/Images";
 
 //#endregion
 
 //#region drawing
 
-export const SCALE = 2;
-export const PLAYER_HEADER_PADDING = 10;
+export const SCALE: number = 2;
+export const PLAYER_HEADER_PADDING: number = 10;
 
 //#endregion

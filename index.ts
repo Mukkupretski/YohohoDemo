@@ -34,7 +34,7 @@ function clearCanvas() {
 const ownPlayer: OwnPlayer = new OwnPlayer(
   0,
   0,
-  Skins.AMOGUS,
+  Skins.PYTHAGORAS,
   Swords.PYTHAGORAS
 );
 
@@ -47,6 +47,7 @@ let otherPlayers: OtherPlayer[] = [];
 const nameInput = document.querySelector<HTMLInputElement>("#name")!;
 nameInput.addEventListener("change", () => {
   ownPlayer.name = nameInput.value;
+  nameInput.blur();
 });
 
 //#endregion
