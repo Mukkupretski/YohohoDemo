@@ -49,9 +49,9 @@ export class PlayerHeader {
     context.textAlign = "center";
     context.textBaseline = "bottom";
     context.fillStyle = NO_RENDER_COLOR;
-    context.font = `${Math.round(PLAYER_HEADER_PADDING * scale)}px Arial`;
+    context.font = `${Math.round(this.barHeight * scale)}px Arial`;
     context.fillText(
-      player.name,
+      this.owner.name,
       0,
       (-this.owner.width / 2 -
         PLAYER_HEADER_PADDING -
@@ -190,20 +190,19 @@ export class OwnSword extends Sword {
   }
 
   swing() {
-    switch (this.angle) {
-      case 30:
-        this.direction = "right";
-      case 150:
-        this.direction = "left";
+    if (this.angle == 30) {
+      this.direction = "right";
+    } else if (this.angle == 150) {
+      this.direction = "left";
     }
   }
 
   update(player: OwnPlayer, context: CanvasRenderingContext2D) {
     if (this.direction !== "static") {
-      if (this.angle >= 150) {
+      if (this.angle >= 150 && this.direction == "right") {
         this.direction = "static";
         this.angle = 150;
-      } else if (this.angle <= 30) {
+      } else if (this.angle <= 30 && this.direction == "left") {
         this.direction = "static";
         this.angle = 30;
       } else {

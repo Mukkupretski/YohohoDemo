@@ -100,11 +100,13 @@ export class OwnPlayer extends Player {
   dashAcc: number;
   isAttacking: boolean;
   speedVector: [number, number];
+  dashPosis: [boolean, boolean];
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, 0, 100, "", swordskin);
     this.targetrotation = 0;
     this.coins = 0;
     this.speedVector = [0, 0];
+    this.dashPosis = [false, false];
     this.dashAcc = 0;
     this.isAttacking = false;
   }
@@ -123,46 +125,49 @@ export class OwnPlayer extends Player {
     //Check if spacebar was pressed and there is no current spacebar action
 
     if (keys.spacebartime != 0 && !this.isAttacking && this.dashAcc == 0) {
-      // //Swing attack
-      // if (keys.spacebartime < 1000) {
-      //   this.isAttacking = true;
-      //   (this.sword as unknown as OwnSword).swing();
-      //   //Geometry dash attack
-      // } else {
-      //   const power = Math.min(keys.spacebartime / 1000, 3);
-      //   this.speedVector = [
-      //     power * Math.cos(((this.rotation + 90) / 180) * Math.PI),
-      //     power * Math.sin(((this.rotation + 90) / 180) * Math.PI),
-      //   ];
-      //   this.dashAcc = power / 8;
-      // }
-      console.log("Spacebar time: " + keys.spacebartime);
+      //Swing attack if time under 500 ms
+      if (keys.spacebartime < 500) {
+        this.isAttacking = true;
+        (this.sword as unknown as OwnSword).swing();
+        //Geometry dash attack
+      } else {
+        const power = Math.min(keys.spacebartime / 1000, 2) * 80;
+        this.speedVector = [
+          power * Math.cos(((this.rotation + 90) / 180) * Math.PI),
+          //Flipping y because "up" (positive direction) is actually down in the canvas
+          -power * Math.sin(((this.rotation + 90) / 180) * Math.PI),
+        ];
+        (this.sword as unknown as OwnSword).swing();
+        this.dashPosis = [this.speedVector[0] > 0, this.speedVector[1] > 0];
+        this.dashAcc = power / 8;
+      }
       spacebarCallback();
     }
     //Slowing dash
     if (this.dashAcc != 0) {
-      // if (this.speedVector[0] < 0)
-      //   this.speedVector[0] -=
-      //     this.dashAcc * Math.cos(((this.rotation + 90) / 180) * Math.PI);
-      // this.speedVector[1] -=
-      //   this.dashAcc * Math.sin(((this.rotation + 90) / 180) * Math.PI);
-      // //Stopping dash when slow enough
-      // if (
-      //   Math.abs(this.speedVector[0]) <= 1 &&
-      //   Math.abs(this.speedVector[1]) <= 1
-      // ) {
-      //   this.dashAcc = 0;
-      // }
+      this.speedVector[0] +=
+        -this.dashAcc * Math.cos(((this.rotation + 90) / 180) * Math.PI);
+      this.speedVector[1] +=
+        this.dashAcc * Math.sin(((this.rotation + 90) / 180) * Math.PI);
+      //Stopping dash when slow enough
+      if (
+        (this.speedVector[0] > 0 !== this.dashPosis[0] ||
+          this.speedVector[0] == 0) &&
+        (this.speedVector[1] > 0 !== this.dashPosis[1] ||
+          this.speedVector[1] == 0)
+      ) {
+        this.dashAcc = 0;
+      }
     } else if (this.isAttacking) {
-      // this.speedVector = [0, 0];
-      // if ((this.sword as unknown as OwnSword).direction === "static") {
-      //   this.isAttacking = false;
-      // }
+      this.speedVector = [0, 0];
+      if ((this.sword as unknown as OwnSword).direction === "static") {
+        this.isAttacking = false;
+      }
     }
     //Happens only if player is not attacking or geometry dashing
     else {
       //Changing sword opacity
-      this.sword.swordopacity = Math.min(keys.spacebarhold / 1000, 1);
+      this.sword.swordopacity = Math.min(keys.spacebarhold / 1000, 2) / 2;
       //Set speed vector by which keys are pressed
       this.speedVector = [
         (keys.a ? -10 : 0) + (keys.d ? 10 : 0),
@@ -173,6 +178,7 @@ export class OwnPlayer extends Player {
         this.targetrotation =
           (180 / Math.PI) *
           Math.acos(
+            //Flipping y because positive should actually be up
             -this.speedVector[1] /
               Math.sqrt(this.speedVector[0] ** 2 + this.speedVector[1] ** 2)
           );
@@ -185,7 +191,7 @@ export class OwnPlayer extends Player {
         if (Math.abs(this.rotation - this.targetrotation) < 10) {
           this.rotation = this.targetrotation;
         } else {
-          //Probably works but might not
+          //Probably works but might not - clarification: didn't work but now does
           this.rotation =
             (this.rotation +
               Math.sign(this.targetrotation - this.rotation) *

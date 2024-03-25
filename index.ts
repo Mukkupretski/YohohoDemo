@@ -29,8 +29,6 @@ function clearCanvas() {
 
 //#endregion
 
-//#region Game rendering
-
 //#region initializing players
 
 const ownPlayer: OwnPlayer = new OwnPlayer(
@@ -41,6 +39,15 @@ const ownPlayer: OwnPlayer = new OwnPlayer(
 );
 
 let otherPlayers: OtherPlayer[] = [];
+
+//#endregion
+
+//#region changing name
+
+const nameInput = document.querySelector<HTMLInputElement>("#name")!;
+nameInput.addEventListener("change", () => {
+  ownPlayer.name = nameInput.value;
+});
 
 //#endregion
 
@@ -101,7 +108,6 @@ window.addEventListener("keydown", (e) => {
       break;
 
     case "s":
-      console.log("Heree");
       keys.s = true;
       break;
     case " ":
@@ -110,7 +116,6 @@ window.addEventListener("keydown", (e) => {
         !ownPlayer.isAttacking &&
         ownPlayer.dashAcc == 0
       ) {
-        console.log("Keydown");
         keys.spacebardown = new Date().getTime();
       }
   }
@@ -140,7 +145,6 @@ window.addEventListener("keyup", (e) => {
         ownPlayer.dashAcc == 0 &&
         keys.spacebardown
       ) {
-        console.log("keyup");
         keys.spacebartime = new Date().getTime() - keys.spacebardown;
         keys.spacebardown = undefined;
       }
