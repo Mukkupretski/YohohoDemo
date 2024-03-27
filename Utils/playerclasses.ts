@@ -2,7 +2,13 @@ import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 import { Skins, Swords, getSkinPos } from "./enums";
 import { OtherSword, OwnSword, PlayerHeader, Sword } from "./playermiscclasses";
 import { Thing } from "./thingclasses";
-import { SerializedOtherPlayer, SerializedPlayer } from "./serialtypes";
+import {
+  SerializedOtherPlayer,
+  SerializedPlayer,
+  SerializedSword,
+} from "./serialtypes";
+import { Socket } from "socket.io-client";
+import { ClientToServerEvents, ServerToClientEvent } from "./eventtypes";
 
 export abstract class Player {
   rotation: number;
@@ -101,12 +107,14 @@ export class OwnPlayer extends Player {
   isAttacking: boolean;
   speedVector: [number, number];
   dashPosis: [boolean, boolean];
+  dashStart: [number, number];
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, 0, 100, "", swordskin);
     this.targetrotation = 0;
     this.coins = 0;
     this.speedVector = [0, 0];
     this.dashPosis = [false, false];
+    this.dashStart = [0, 0];
     this.dashAcc = 0;
     this.isAttacking = false;
   }
@@ -120,7 +128,8 @@ export class OwnPlayer extends Player {
       spacebartime: number;
       spacebarhold: number;
     },
-    spacebarCallback: () => void
+    spacebarCallback: () => void,
+    socket: Socket<ServerToClientEvent, ClientToServerEvents>
   ): void {
     //Check if spacebar was pressed and there is no current spacebar action
 
@@ -140,6 +149,7 @@ export class OwnPlayer extends Player {
         (this.sword as unknown as OwnSword).swing();
         this.dashPosis = [this.speedVector[0] > 0, this.speedVector[1] > 0];
         this.dashAcc = power / 8;
+        this.dashStart = [this.x, this.y];
       }
       spacebarCallback();
     }
@@ -157,11 +167,13 @@ export class OwnPlayer extends Player {
           this.speedVector[1] == 0)
       ) {
         this.dashAcc = 0;
+        socket.emit("dash", this.serialize(), this.dashStart);
       }
     } else if (this.isAttacking) {
       this.speedVector = [0, 0];
       if ((this.sword as unknown as OwnSword).direction === "static") {
         this.isAttacking = false;
+        socket.emit("swing", this.serialize());
       }
     }
     //Happens only if player is not attacking or geometry dashing
@@ -240,29 +252,26 @@ export class OtherPlayer extends Player {
     y,
     size,
     skin,
-    swordopacity,
-    swordskin,
+    sword,
+
     rotation,
     health,
     id,
     name,
-    swordangle,
   }: {
     x: number;
     y: number;
     size: number;
     skin: Skins;
-    swordskin: Swords;
+    sword: SerializedSword;
     rotation: number;
     health: number;
     id: string;
     name: string;
-    swordopacity: number;
-    swordangle: number;
   }) {
-    super(x, y, size, skin, rotation, health, name, swordskin, {
-      angle: swordangle,
-      swordopacity: swordopacity,
+    super(x, y, size, skin, rotation, health, name, sword.swordskin, {
+      swordopacity: sword.swordopacity,
+      angle: sword.angle,
     });
     this.id = id;
   }

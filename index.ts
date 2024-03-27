@@ -34,7 +34,7 @@ function clearCanvas() {
 const ownPlayer: OwnPlayer = new OwnPlayer(
   0,
   0,
-  Skins.PYTHAGORAS,
+  Skins.NORMAL,
   Swords.PYTHAGORAS
 );
 
@@ -66,7 +66,8 @@ function renderGame() {
     },
     () => {
       keys.spacebartime = 0;
-    }
+    },
+    socket
   );
 
   otherPlayers.forEach((p) => p.update(ownPlayer, game));
@@ -174,5 +175,7 @@ socket.on("playerChange", (otherPlayer) => {
 socket.on("playerLeft", (id) => {
   otherPlayers = otherPlayers.filter((p) => p.id !== id);
 });
+
+socket.on("playerDamage", (damager, damage) => {});
 
 //#endregion
