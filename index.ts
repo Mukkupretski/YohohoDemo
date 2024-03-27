@@ -34,7 +34,7 @@ function clearCanvas() {
 const ownPlayer: OwnPlayer = new OwnPlayer(
   0,
   0,
-  Skins.NORMAL,
+  Skins.AMOGUS,
   Swords.PYTHAGORAS
 );
 
@@ -176,6 +176,12 @@ socket.on("playerLeft", (id) => {
   otherPlayers = otherPlayers.filter((p) => p.id !== id);
 });
 
-socket.on("playerDamage", (damager, damage) => {});
+socket.on("playerDamage", (damager, damage) => {
+  ownPlayer.removeHealth(damage * damager.size);
+  if (ownPlayer.health <= 0) {
+    ownPlayer.reset();
+    alert("YOU DIED LOL");
+  }
+});
 
 //#endregion

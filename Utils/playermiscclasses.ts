@@ -43,7 +43,7 @@ export class PlayerHeader {
     context.fillRect(
       (-this.barwidth / 2) * scale,
       (-this.owner.width / 2 - PLAYER_HEADER_PADDING - this.barHeight) * scale,
-      this.barwidth * scale,
+      (this.barwidth * scale * this.owner.health) / (100 * this.owner.size),
       this.barHeight * scale
     );
     context.textAlign = "center";
@@ -108,6 +108,7 @@ export class Sword {
     Thing.doTranslate(player, context, this.owner, this.owner.size);
     context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
     context.fillStyle = NO_RENDER_COLOR;
+    //Hand: center, center of player edge, size: 64px
     if (this.handimg) {
       const skinpos = getSkinPos(this.owner.skin);
       context.drawImage(
@@ -129,6 +130,7 @@ export class Sword {
         this.handsize * scale
       );
     }
+    //Sword: handle at player's width's end, height centered to player's center
     if (this.swordimg) {
       const skinpos = getSwordPos(this.swordskin);
       context.drawImage(
@@ -137,7 +139,7 @@ export class Sword {
         skinpos[1] * 128,
         256,
         64,
-        (-this.owner.width - this.swordwidth / 2) * scale,
+        (-this.owner.width / 2 - this.swordwidth) * scale,
         -this.swordheight * scale,
         this.swordwidth * scale,
         this.swordheight * scale
@@ -149,7 +151,7 @@ export class Sword {
         skinpos[1] * 128 + 64,
         256,
         64,
-        (-this.owner.width - this.swordwidth / 2) * scale,
+        (-this.owner.width / 2 - this.swordwidth) * scale,
         -this.swordheight * scale,
         this.swordwidth * scale,
         this.swordheight * scale
@@ -172,6 +174,8 @@ export class Sword {
       angle: this.angle,
       swordopacity: this.swordopacity,
       swordskin: this.swordskin,
+      swordwidth: this.swordwidth,
+      swordheigh: this.swordheight,
     };
   }
   setSword(sword: SerializedSword): void {
@@ -189,6 +193,11 @@ export class OwnSword extends Sword {
     this.direction = "static";
   }
 
+  reset(): void {
+    this.angle = 30;
+    this.swordopacity = 0;
+    this.direction = "static";
+  }
   swing() {
     if (this.angle == 30) {
       this.direction = "right";

@@ -12,5 +12,9 @@ export type ClientToServerEvents = {
   playerJoined: (player: SerializedPlayer) => void;
   playerChange: (player: SerializedPlayer) => void;
   swing: (player: SerializedPlayer) => void;
-  dash: (player: SerializedPlayer, dashStart: [number, number]) => void;
+  dash: (
+    player: SerializedPlayer,
+    power: number,
+    dashStart: [number, number]
+  ) => void;
 };

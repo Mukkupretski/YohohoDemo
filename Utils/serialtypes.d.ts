@@ -4,6 +4,8 @@ export type SerializedThing = {
   rotation: number;
 };
 export interface SerializedPlayer {
+  width: number;
+  height: number;
   rotation: number;
   x: number;
   y: number;
@@ -17,6 +19,8 @@ export interface SerializedSword {
   angle: number;
   swordopacity: number;
   swordskin: Swords;
+  swordwidth: number;
+  swordheigh: number;
 }
 export interface SerializedOtherPlayer extends SerializedPlayer {
   id: string;

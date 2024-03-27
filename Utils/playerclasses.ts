@@ -166,14 +166,19 @@ export class OwnPlayer extends Player {
         (this.speedVector[1] > 0 !== this.dashPosis[1] ||
           this.speedVector[1] == 0)
       ) {
+        socket.emit(
+          "dash",
+          this.serialize(),
+          this.dashAcc * 2 * 8,
+          this.dashStart
+        );
         this.dashAcc = 0;
-        socket.emit("dash", this.serialize(), this.dashStart);
       }
     } else if (this.isAttacking) {
       this.speedVector = [0, 0];
       if ((this.sword as unknown as OwnSword).direction === "static") {
-        this.isAttacking = false;
         socket.emit("swing", this.serialize());
+        this.isAttacking = false;
       }
     }
     //Happens only if player is not attacking or geometry dashing
@@ -229,9 +234,20 @@ export class OwnPlayer extends Player {
   }
   grow(amount: number) {
     this.size += amount / 10;
-    this.health = 100 * this.size;
+    this.health = this.health * this.size;
   }
-
+  removeHealth(amount: number) {
+    this.health -= amount;
+  }
+  reset(): void {
+    this.dashAcc = 0;
+    this.isAttacking = false;
+    this.size = 1;
+    (this.sword as unknown as OwnSword).reset();
+    this.x = 0;
+    this.y = 0;
+    this.health = 100;
+  }
   serialize(): SerializedPlayer {
     return {
       health: this.health,
@@ -242,6 +258,8 @@ export class OwnPlayer extends Player {
       skin: this.skin,
       sword: this.sword.serialize(),
       rotation: this.rotation,
+      height: this.height,
+      width: this.width,
     };
   }
 }
