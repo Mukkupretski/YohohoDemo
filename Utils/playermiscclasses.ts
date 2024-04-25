@@ -1,4 +1,4 @@
-import { Swords, getSkinPos, getSwordPos } from "./enums";
+import { Swords } from "./enums";
 import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
 import { Thing } from "./thingclasses";
 import {
@@ -110,7 +110,7 @@ export class Sword {
     context.fillStyle = NO_RENDER_COLOR;
     //Hand: center, center of player edge, size: 64px
     if (this.handimg) {
-      const skinpos = getSkinPos(this.owner.skin);
+      const skinpos = [this.owner.skin % 4, Math.floor(this.owner.skin / 4)];
       context.drawImage(
         this.handimg,
         skinpos[0] * 64,
@@ -132,7 +132,7 @@ export class Sword {
     }
     //Sword: handle at player's width's end, height centered to player's center
     if (this.swordimg) {
-      const skinpos = getSwordPos(this.swordskin);
+      const skinpos = [this.swordskin % 4, Math.floor(this.swordskin / 4)];
       context.drawImage(
         this.swordimg,
         skinpos[0] * 256,
@@ -169,6 +169,7 @@ export class Sword {
   update(player: OwnPlayer, context: CanvasRenderingContext2D) {
     this.draw(player, context);
   }
+
   serialize(): SerializedSword {
     return {
       angle: this.angle,

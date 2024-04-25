@@ -1,5 +1,5 @@
 import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
-import { Skins, Swords, getSkinPos } from "./enums";
+import { Skins, Swords } from "./enums";
 import { OtherSword, OwnSword, PlayerHeader, Sword } from "./playermiscclasses";
 import { Thing } from "./thingclasses";
 import {
@@ -73,7 +73,7 @@ export abstract class Player {
     Thing.doTranslate(player, context, this, this.size);
     context.rotate((-this.rotation / 180) * Math.PI);
     if (this.image) {
-      const skinpos = getSkinPos(this.skin);
+      const skinpos = [this.skin % 4, Math.floor(this.skin / 4)];
 
       context.drawImage(
         this.image,
@@ -108,6 +108,7 @@ export class OwnPlayer extends Player {
   speedVector: [number, number];
   dashPosis: [boolean, boolean];
   dashStart: [number, number];
+  externalForces: [number, number];
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, 0, 100, "", swordskin);
     this.targetrotation = 0;
@@ -115,6 +116,7 @@ export class OwnPlayer extends Player {
     this.speedVector = [0, 0];
     this.dashPosis = [false, false];
     this.dashStart = [0, 0];
+    this.externalForces = [0, 0];
     this.dashAcc = 0;
     this.isAttacking = false;
   }
@@ -222,9 +224,17 @@ export class OwnPlayer extends Player {
         }
       }
     }
-    this.x += this.speedVector[0];
-    this.y += this.speedVector[1];
+    this.x += this.speedVector[0] + this.externalForces[0];
+    this.y += this.speedVector[1] + this.externalForces[0];
     this.draw(this, context);
+  }
+  applyExternalForce(force: [number, number], duration: number) {
+    this.externalForces[0] += force[0];
+    this.externalForces[1] += force[1];
+    setTimeout(() => {
+      this.externalForces[0] -= force[0];
+      this.externalForces[1] -= force[1];
+    }, 1000 * duration);
   }
   setSkin(skin: Skins): void {
     this.skin = skin;

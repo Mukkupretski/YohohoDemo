@@ -1,0 +1,29 @@
+How the map should be generated (20 000 x 20 000)
+
+0. Grasspatches:
+
+Not to center, width/100, radius 64-1024
+
+1. Buildings:
+
+only in the 60% center of the map (no Buildings in the direct center~~10%)
+8 zones - 80% change of spawning in each
+20%-45%, 45%-55%, 55%-80%
+
+2. Useless stuff:
+
+for i in range(Math.floor(width/avg(stuff)*height/avg(stuff)/10))
+
+if doesn't collide, create it.
+
+NOT IN CENTER
+
+3. Treasures: width/400 kpl, random but shouldn't collide with huts
+
+4. Coins:
+
+-Around treasures (10-50 units, 20-40 kpl)
+
+-width/100 kpl places, where on 50 radius around 5-50
+    -Dont collide with huts
+

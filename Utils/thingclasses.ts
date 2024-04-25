@@ -6,33 +6,31 @@ import {
   MAP_COLOR,
   NO_RENDER_COLOR,
 } from "./constants";
-import { SerializedThing } from "./serialtypes";
+import { SerializedGrassPatch, SerializedThing } from "./serialtypes";
+import { ThingTypes } from "./enums";
 
-export abstract class Thing {
+export class Thing {
   image: CanvasImageSource | undefined;
   width: number;
   height: number;
   x: number;
   y: number;
   rotation: number;
+  thingType: ThingTypes;
   constructor(
-    imageSrc: string,
-    width: number,
-    height: number,
-    x: number,
-    y: number,
-    rotation: number
+    thing: SerializedThing
   ) {
     const elem = document.createElement("img");
-    elem.src = imageSrc;
+    this.thingType = thing.thingType;
+    elem.src = `${IMAGE_PATH}/${this.thingType}`;
     elem.onload = () => {
       this.image = elem;
     };
-    this.width = width;
-    this.height = height;
-    this.x = x;
-    this.y = y;
-    this.rotation = rotation;
+    this.width = thing.width;
+    this.height = thing.height;
+    this.x = thing.x;
+    this.y = thing.y;
+    this.rotation = thing.rotation;
   }
   static isInscreen(
     player: OwnPlayer,
@@ -49,8 +47,8 @@ export abstract class Thing {
   draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     if (!Thing.isInscreen(player, context.canvas, this)) return;
     context.save();
-    context.rotate(((-2 * Math.PI) / 180) * this.rotation);
     Thing.doTranslate(player, context, this);
+    context.rotate(((-2 * Math.PI) / 180) * this.rotation);
     if (this.image) {
       context.drawImage(
         this.image,
@@ -98,19 +96,35 @@ export abstract class Thing {
     );
   }
   static getSerializedThing(thing: Thing): SerializedThing {
-    return { x: thing.x, y: thing.y, rotation: thing.rotation };
+    return {
+      x: thing.x,
+      y: thing.y,
+      rotation: thing.rotation,
+      width: thing.width,
+      height: thing.height,
+      thingType: thing.thingType,
+    };
+  }
+  static collide(
+    thing1: Thing | SerializedThing,
+    thing2: Thing | SerializedThing
+  ): boolean {
+    return (
+      (thing1.width + thing2.width) / 2 < Math.abs(thing1.x - thing2.x) &&
+      (thing1.height + thing2.height) / 2 < Math.abs(thing1.y - thing2.y)
+    );
   }
 }
 export abstract class Interactable extends Thing {
   constructor(
-    imageSrc: string,
+    thingType: ThingTypes,
     width: number,
     height: number,
     x: number,
     y: number,
     rotation: number
   ) {
-    super(imageSrc, width, height, x, y, rotation);
+    super({thingType: thingType, width: width, height: height, x: x, y: y, rotation: rotation});
   }
   overlap(player: OwnPlayer): boolean {
     return (
@@ -123,31 +137,20 @@ export abstract class Interactable extends Thing {
   abstract update(player: OwnPlayer, context: CanvasRenderingContext2D): void;
 }
 
-export class Tree extends Thing {
-  constructor(x: number, y: number, rotation: number) {
-    super(`${IMAGE_PATH}/tree.png`, 384, 384, x, y, rotation);
+export abstract class LayerSwitcher extends Interactable {
+  onForeground: boolean;
+  constructor(thingType: ThingTypes, x: number, y: number, rotation: number) {
+    super(thingType, x, y, 512, 512, rotation);
+    this.onForeground = false;
   }
+  abstract update(player: OwnPlayer, context: CanvasRenderingContext2D): void;
 }
-export class Bush extends Thing {
-  constructor(x: number, y: number, rotation: number) {
-    super(`${IMAGE_PATH}/bush.png`, 128, 128, x, y, rotation);
-  }
-}
-export class Skull extends Thing {
-  constructor(x: number, y: number, rotation: number) {
-    super(`${IMAGE_PATH}/skull.png`, 256, 256, x, y, rotation);
-  }
-}
-export class Treasure extends Thing {
-  constructor(x: number, y: number, rotation: number) {
-    super(`${IMAGE_PATH}/treasure.png`, 256, 128, x, y, rotation);
-  }
-}
-export class Hut extends Interactable {
+
+export class Hut extends LayerSwitcher {
   floorimg: CanvasImageSource | undefined;
   hutimg: CanvasImageSource | undefined;
-  constructor(x: number, y: number, rotation: number) {
-    super(`${IMAGE_PATH}/hut.png`, x, y, 512, 512, rotation);
+  constructor(thing: SerializedThing) {
+    super(ThingTypes.HUT, thing.x, thing.y, thing.rotation);
     const floorelem = document.createElement("img");
     floorelem.src = `${IMAGE_PATH}/hutfloor.png`;
     floorelem.onload = () => {
@@ -162,25 +165,12 @@ export class Hut extends Interactable {
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     if (this.overlap(player)) {
       this.image = this.floorimg;
+      this.onForeground = false;
     } else {
       this.image = this.hutimg;
+      this.onForeground = true;
     }
     this.draw(player, context);
-  }
-}
-export class Coin extends Interactable {
-  collected: boolean;
-  constructor(x: number, y: number, rotation: number) {
-    super(`${IMAGE_PATH}/coin.png`, x, y, 32, 32, rotation);
-    this.collected = false;
-  }
-  update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
-    if (this.overlap(player)) {
-      this.collected = true;
-    }
-    if (!this.collected) {
-      this.draw(player, context);
-    }
   }
 }
 
@@ -188,10 +178,10 @@ export class GrassPatch {
   x: number;
   y: number;
   r: number;
-  constructor(x: number, y: number, r: number) {
-    this.x = x;
-    this.y = y;
-    this.r = r;
+  constructor(grassPatch: SerializedGrassPatch) {
+    this.x = grassPatch.x;
+    this.y = grassPatch.y;
+    this.r = grassPatch.width;
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     context.save();
@@ -209,14 +199,21 @@ export class GrassPatch {
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D) {
     if (
-      !Thing.isInscreen(player, context.canvas, {
-        x: this.x,
-        y: this.y,
-        width: this.r,
-        height: this.r,
-      })
+      Thing.isInscreen(
+        player,
+        context.canvas,
+        GrassPatch.getSerializedGrassPatch(this)
+      )
     ) {
       this.draw(player, context);
     }
+  }
+  static getSerializedGrassPatch(grassPatch: GrassPatch): SerializedGrassPatch {
+    return {
+      x: grassPatch.x,
+      y: grassPatch.y,
+      width: grassPatch.r * 2,
+      height: grassPatch.r * 2,
+    };
   }
 }

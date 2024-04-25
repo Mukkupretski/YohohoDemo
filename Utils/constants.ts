@@ -18,3 +18,13 @@ export const SCALE: number = 2;
 export const PLAYER_HEADER_PADDING: number = 10;
 
 //#endregion
+
+//#region metadata
+
+export const specialThings: string[] = [
+  `${IMAGE_PATH}/hut.png`,
+  `${IMAGE_PATH}/hutfloor.png`,
+  "grasspatch",
+];
+
+//#endregion
