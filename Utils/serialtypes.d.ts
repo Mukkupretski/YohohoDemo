@@ -44,6 +44,7 @@ export interface SerializedWorldMap {
   staticBackground: SerializedThing[];
   dynamicBackground: SerializedThing[];
   staticChanging: SerializedThing[];
+  size: number;
 }
 export interface SerializedGame {
   id: string;

@@ -19,6 +19,7 @@
 - Console
 - Music and sounds
 - Stuff in the middle of the world map
+- Storm
 - Minimap
 - Voice & video chat
 - Natural disasters update (Sharknado)
@@ -44,5 +45,5 @@
 - Tree: 384x384px - √ tree.png
 - Bush: 128x128px - √ bush1.png, bush2.png
 - Hut: 512x512px hut.png
-- Hutfloor: 512x512px - √  hutfloor.png
+- Hutfloor: 512x512px - √ hutfloor.png
 - Rock: 64x64px - √ rock.png

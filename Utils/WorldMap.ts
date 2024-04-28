@@ -1,6 +1,10 @@
 import { ThingTypes } from "./enums";
 import { OwnPlayer } from "./playerclasses";
-import { SerializedWorldMap, SerializedThing, SerializedGrassPatch } from "./serialtypes";
+import {
+  SerializedWorldMap,
+  SerializedThing,
+  SerializedGrassPatch,
+} from "./serialtypes";
 import { GrassPatch, Hut, LayerSwitcher, Thing } from "./thingclasses";
 
 export default class WorldMap {
@@ -10,28 +14,30 @@ export default class WorldMap {
   dynamicBackground: Thing[];
   staticChanging: LayerSwitcher[];
   grass: GrassPatch[];
+  size: number;
   constructor(map: SerializedWorldMap) {
-    this.grass = map.grass.map((gr)=>{
-      return new GrassPatch(gr)
-    })
-    this.staticBackground = map.staticBackground.map((obj)=>{
-      return new Thing(obj)
-    })
-    this.staticForeground= map.staticForeground.map((obj)=>{
-      return new Thing(obj)
-    })
-    this.dynamicBackground = map.dynamicBackground.map((obj)=>{
-      return new Thing(obj)
-    })
-    this.dynamicForeground= map.dynamicForeground.map((obj)=>{
-      return new Thing(obj)
-    })
-    this.staticChanging = map.staticChanging.map((obj)=>{
-      if(obj.thingType == ThingTypes.HUT){
-        return new Hut(obj)
+    this.grass = map.grass.map((gr) => {
+      return new GrassPatch(gr);
+    });
+    this.staticBackground = map.staticBackground.map((obj) => {
+      return new Thing(obj);
+    });
+    this.staticForeground = map.staticForeground.map((obj) => {
+      return new Thing(obj);
+    });
+    this.dynamicBackground = map.dynamicBackground.map((obj) => {
+      return new Thing(obj);
+    });
+    this.dynamicForeground = map.dynamicForeground.map((obj) => {
+      return new Thing(obj);
+    });
+    this.staticChanging = map.staticChanging.map((obj) => {
+      if (obj.thingType == ThingTypes.HUT) {
+        return new Hut(obj);
       }
-      return new Hut(obj)
-    })
+      return new Hut(obj);
+    });
+    this.size = map.size;
   }
 
   drawMinimap(context: CanvasRenderingContext2D): void {}
@@ -44,19 +50,30 @@ export default class WorldMap {
       staticForeground: [],
       dynamicBackground: [],
       dynamicForeground: [],
+      size: size,
     };
     //generating grasspatches
-    outerLoop: for(let i = 0; i < Math.floor(size/100); i++){
-      const r = this.getRandomInteger(64, 1024)
+    outerLoop: for (let i = 0; i < Math.floor(size / 100); i++) {
+      const r = this.getRandomInteger(64, 1024);
       const randomPos: [number, number] = [
         Math.round(this.getRandomInteger(0, size)),
         Math.round(this.getRandomInteger(0, size)),
       ];
-      if(randomPos[0]-r<0 || randomPos[0]+r>size || randomPos[1]-r<0 || randomPos[1]+r>size){
-        continue outerLoop
+      if (
+        randomPos[0] - r < 0 ||
+        randomPos[0] + r > size ||
+        randomPos[1] - r < 0 ||
+        randomPos[1] + r > size
+      ) {
+        continue outerLoop;
       }
-      const patch: SerializedGrassPatch = {x: randomPos[0], y:randomPos[1], width: r, height: r};
-      map.grass.push(patch)
+      const patch: SerializedGrassPatch = {
+        x: randomPos[0],
+        y: randomPos[1],
+        width: r,
+        height: r,
+      };
+      map.grass.push(patch);
     }
 
     //generating buildings
@@ -116,15 +133,21 @@ export default class WorldMap {
     outerLoop: for (
       let i = 0;
       i <
-      Math.floor(((size / ((384 + 128 + 128) / 3)) * size) / ((384 + 128 + 128) / 3) / 10);
+      Math.floor(
+        ((size / ((384 + 128 + 128) / 3)) * size) / ((384 + 128 + 128) / 3) / 10
+      );
       i++
     ) {
       const randomPos: [number, number] = [
         Math.round(this.getRandomInteger(0, size)),
         Math.round(this.getRandomInteger(0, size)),
       ];
-      const plantType: ThingTypes = [ThingTypes.BUSH1, ThingTypes.BUSH2, ThingTypes.TREE][1]
-      const plantSize: number = (plantType === ThingTypes.TREE ? 384 : 128);
+      const plantType: ThingTypes = [
+        ThingTypes.BUSH1,
+        ThingTypes.BUSH2,
+        ThingTypes.TREE,
+      ][1];
+      const plantSize: number = plantType === ThingTypes.TREE ? 384 : 128;
       const plant: SerializedThing = {
         x: randomPos[0],
         y: randomPos[1],
@@ -144,13 +167,14 @@ export default class WorldMap {
         }
       }
       for (let plt of map.staticBackground) {
-        
         if (Thing.collide(plt, plant)) {
           continue outerLoop;
         }
-      
       }
-      (plantType === ThingTypes.TREE?map.staticForeground:map.staticBackground).push(plant);
+      (plantType === ThingTypes.TREE
+        ? map.staticForeground
+        : map.staticBackground
+      ).push(plant);
     }
 
     //generating treasures

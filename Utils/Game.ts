@@ -3,6 +3,7 @@ import WorldMap from "./WorldMap";
 import { OtherPlayer, OwnPlayer } from "./playerclasses";
 import { SerializedGame } from "./serialtypes";
 import { ClientToServerEvents, ServerToClientEvent } from "./eventtypes";
+import { SAND_COLOR, MAP_COLOR, LINE_COLOR } from "./constants";
 
 export class Game {
   id: string;
@@ -33,14 +34,43 @@ export class Game {
     spacebarCallback: () => void,
     socket: Socket<ServerToClientEvent, ClientToServerEvents>
   ) {
+    const scale = 1 / player.size;
+    context.save();
+    context.translate(-player.x * scale, -player.y * scale);
+    context.save();
+    context.translate(-256 * scale, -256 * scale);
     //Draw sand
-
+    context.fillStyle = SAND_COLOR;
+    context.fillRect(
+      0,
+      0,
+      (512 + this.map.size) * scale,
+      (512 + this.map.size) * scale
+    );
+    context.restore();
     //Draw grassland
-
+    context.fillStyle = MAP_COLOR;
+    context.fillRect(0, 0, this.map.size * scale, this.map.size * scale);
+    context.restore();
     this.map.grass.forEach((gr) => {
       gr.update(player, context);
     });
     //Draw grid
+    context.save();
+    context.translate(-player.x * scale, -player.y * scale);
+    context.lineWidth = 10 * scale;
+    context.strokeStyle = LINE_COLOR;
+    for (let i = 0; i < this.map.size / 100; i++) {
+      for (let j = 0; j < this.map.size / 100; j++) {
+        context.strokeRect(
+          i * 100 * scale,
+          j * 100 * scale,
+          100 * scale,
+          100 * scale
+        );
+      }
+    }
+    context.restore();
 
     this.map.staticBackground.forEach((el) => {
       el.update(player, context);
@@ -68,6 +98,6 @@ export class Game {
     this.map.dynamicForeground.forEach((el) => {
       el.update(player, context);
     });
-    //Draw storm
+    //TODO: Draw storm
   }
 }
