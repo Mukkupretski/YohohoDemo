@@ -1,5 +1,5 @@
 import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
-import { SerializedOtherPlayer } from "./serialtypes";
+import { SerializedOtherPlayer, SerializedPlayer } from "./serialtypes";
 
 export type ServerToClientEvent = {
   playerChange: (player: SerializedOtherPlayer) => void;

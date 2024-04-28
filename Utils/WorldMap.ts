@@ -1,5 +1,4 @@
 import { ThingTypes } from "./enums";
-import { OwnPlayer } from "./playerclasses";
 import {
   SerializedWorldMap,
   SerializedThing,

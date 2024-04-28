@@ -42,12 +42,18 @@ let otherPlayers: OtherPlayer[] = [];
 
 //#endregion
 
-//#region changing name
+//#region changing name and size
 
 const nameInput = document.querySelector<HTMLInputElement>("#name")!;
 nameInput.addEventListener("change", () => {
   ownPlayer.name = nameInput.value;
   nameInput.blur();
+});
+
+const sizeInput = document.querySelector<HTMLInputElement>("#size")!;
+sizeInput.addEventListener("change", () => {
+  ownPlayer.size = parseInt(sizeInput.value);
+  sizeInput.blur();
 });
 
 //#endregion
