@@ -32,7 +32,7 @@ export interface SerializedSword {
   swordopacity: number;
   swordskin: Swords;
   swordwidth: number;
-  swordheigh: number;
+  swordheight: number;
 }
 export interface SerializedOtherPlayer extends SerializedPlayer {
   id: string;

@@ -2,7 +2,7 @@ import { Socket } from "socket.io-client";
 import WorldMap from "./WorldMap";
 import { OtherPlayer, OwnPlayer } from "./playerclasses";
 import { SerializedGame } from "./serialtypes";
-import { ClientToServerEvents, ServerToClientEvent } from "./eventtypes";
+import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
 import { SAND_COLOR, MAP_COLOR, LINE_COLOR } from "./constants";
 
 export class Game {
@@ -32,11 +32,14 @@ export class Game {
       spacebarhold: number;
     },
     spacebarCallback: () => void,
-    socket: Socket<ServerToClientEvent, ClientToServerEvents>
+    socket: Socket<ServerToClientEvents, ClientToServerEvents>
   ) {
     const scale = 1 / player.size;
     context.save();
-    context.translate(-player.x * scale, -player.y * scale);
+    context.translate(
+      -player.x * scale + context.canvas.width / 2,
+      -player.y * scale + context.canvas.height / 2
+    );
     context.save();
     context.translate(-256 * scale, -256 * scale);
     //Draw sand
@@ -57,7 +60,10 @@ export class Game {
     });
     //Draw grid
     context.save();
-    context.translate(-player.x * scale, -player.y * scale);
+    context.translate(
+      -player.x * scale + context.canvas.width / 2,
+      -player.y * scale + context.canvas.height / 2
+    );
     context.lineWidth = 10 * scale;
     context.strokeStyle = LINE_COLOR;
     for (let i = 0; i < this.map.size / 100; i++) {

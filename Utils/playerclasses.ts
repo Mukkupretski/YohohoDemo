@@ -8,7 +8,7 @@ import {
   SerializedSword,
 } from "./serialtypes";
 import { Socket } from "socket.io-client";
-import { ClientToServerEvents, ServerToClientEvent } from "./eventtypes";
+import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
 
 export abstract class Player {
   rotation: number;
@@ -131,7 +131,7 @@ export class OwnPlayer extends Player {
       spacebarhold: number;
     },
     spacebarCallback: () => void,
-    socket: Socket<ServerToClientEvent, ClientToServerEvents>
+    socket: Socket<ServerToClientEvents, ClientToServerEvents>
   ): void {
     //Check if spacebar was pressed and there is no current spacebar action
 
@@ -168,18 +168,14 @@ export class OwnPlayer extends Player {
         (this.speedVector[1] > 0 !== this.dashPosis[1] ||
           this.speedVector[1] == 0)
       ) {
-        socket.emit(
-          "dash",
-          this.serialize(),
-          this.dashAcc * 2 * 8,
-          this.dashStart
-        );
+        socket.emit("dash", this.serialize(), this.dashAcc * 4, this.dashStart);
+        socket.emit("swing", this.serialize(), "dash");
         this.dashAcc = 0;
       }
     } else if (this.isAttacking) {
       this.speedVector = [0, 0];
       if ((this.sword as unknown as OwnSword).direction === "static") {
-        socket.emit("swing", this.serialize());
+        socket.emit("swing", this.serialize(), "swing");
         this.isAttacking = false;
       }
     }
@@ -224,8 +220,8 @@ export class OwnPlayer extends Player {
         }
       }
     }
-    this.x += this.speedVector[0] + this.externalForces[0];
-    this.y += this.speedVector[1] + this.externalForces[0];
+    this.x += this.speedVector[0] * 10 + this.externalForces[0];
+    this.y += this.speedVector[1] * 10 + this.externalForces[0];
     this.draw(this, context);
   }
   applyExternalForce(force: [number, number], duration: number) {
@@ -254,8 +250,8 @@ export class OwnPlayer extends Player {
     this.isAttacking = false;
     this.size = 1;
     (this.sword as unknown as OwnSword).reset();
-    this.x = 0;
-    this.y = 0;
+    this.x = 10000;
+    this.y = 10000;
     this.health = 100;
   }
   serialize(): SerializedPlayer {

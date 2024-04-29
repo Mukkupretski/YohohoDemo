@@ -1,17 +1,20 @@
-import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
-import { SerializedOtherPlayer, SerializedPlayer } from "./serialtypes";
+import {
+  SerializedGame,
+  SerializedOtherPlayer,
+  SerializedPlayer,
+} from "./serialtypes";
 
-export type ServerToClientEvent = {
+export type ServerToClientEvents = {
   playerChange: (player: SerializedOtherPlayer) => void;
   playerDamage: (damager: SerializedOtherPlayer, damage: number) => void;
   playerJoined: (player: SerializedOtherPlayer) => void;
-  mapInit: (player: SerializedOtherPlayer[]) => void;
+  mapInit: (map: SerializedGame) => void;
   playerLeft: (id: string) => void;
 };
 export type ClientToServerEvents = {
   playerJoined: (player: SerializedPlayer) => void;
   playerChange: (player: SerializedPlayer) => void;
-  swing: (player: SerializedPlayer) => void;
+  swing: (player: SerializedPlayer, type: "swing" | "dash") => void;
   dash: (
     player: SerializedPlayer,
     power: number,

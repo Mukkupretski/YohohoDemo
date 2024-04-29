@@ -7,15 +7,15 @@ export enum Skins {
 }
 
 export enum ThingTypes {
-  BUSH1 = "bush1.png",
-  BUSH2 = "bush2.png",
-  ROCK = "rock.png",
-  TREE = "tree.png",
-  SKULL = "skull.png",
-  TREASURE = "treasure.png",
-  COIN = "coin.png",
-  HUT = "hut.png",
-  HUTFLOOR = "hutfloor.png",
+  BUSH1 = "Other/bush1.svg",
+  BUSH2 = "Other/bush2.svg",
+  ROCK = "Other/rock.svg",
+  TREE = "Other/tree.svg",
+  SKULL = "Other/skull.svg",
+  TREASURE = "Other/treasure.png",
+  COIN = "Other/coin.png",
+  HUT = "Other/hut.svg",
+  HUTFLOOR = "Other/hutfloor.svg",
 }
 
 export enum Swords {

@@ -17,9 +17,7 @@ export class Thing {
   y: number;
   rotation: number;
   thingType: ThingTypes;
-  constructor(
-    thing: SerializedThing
-  ) {
+  constructor(thing: SerializedThing) {
     const elem = document.createElement("img");
     this.thingType = thing.thingType;
     elem.src = `${IMAGE_PATH}/${this.thingType}`;
@@ -124,7 +122,14 @@ export abstract class Interactable extends Thing {
     y: number,
     rotation: number
   ) {
-    super({thingType: thingType, width: width, height: height, x: x, y: y, rotation: rotation});
+    super({
+      thingType: thingType,
+      width: width,
+      height: height,
+      x: x,
+      y: y,
+      rotation: rotation,
+    });
   }
   overlap(player: OwnPlayer): boolean {
     return (
@@ -152,12 +157,12 @@ export class Hut extends LayerSwitcher {
   constructor(thing: SerializedThing) {
     super(ThingTypes.HUT, thing.x, thing.y, thing.rotation);
     const floorelem = document.createElement("img");
-    floorelem.src = `${IMAGE_PATH}/hutfloor.png`;
+    floorelem.src = `${IMAGE_PATH}/${ThingTypes.HUTFLOOR}`;
     floorelem.onload = () => {
       this.floorimg = floorelem;
     };
     const hutelem = document.createElement("img");
-    hutelem.src = `${IMAGE_PATH}/hut.png`;
+    hutelem.src = `${IMAGE_PATH}/${ThingTypes.HUT}`;
     hutelem.onload = () => {
       this.hutimg = hutelem;
     };
@@ -189,8 +194,8 @@ export class GrassPatch {
     const y0 = context.canvas.height / 2 + (this.y - player.y) / player.size;
     const r0 = this.r / player.size;
     const grd = context.createRadialGradient(x0, y0, 0, x0, y0, r0);
-    grd.addColorStop(0, MAP_COLOR);
-    grd.addColorStop(1, GRASSPATCH_CENTER);
+    grd.addColorStop(0, GRASSPATCH_CENTER);
+    grd.addColorStop(1, MAP_COLOR);
     context.fillStyle = grd;
     context.beginPath();
     context.arc(x0, y0, r0, 0, 2 * Math.PI, false);

@@ -176,7 +176,7 @@ export class Sword {
       swordopacity: this.swordopacity,
       swordskin: this.swordskin,
       swordwidth: this.swordwidth,
-      swordheigh: this.swordheight,
+      swordheight: this.swordheight,
     };
   }
   setSword(sword: SerializedSword): void {

@@ -2,29 +2,30 @@
 
 import { socket } from "./socket";
 import isInInput from "./isInInput";
-import { ServerToClientEvent, ClientToServerEvents } from "./Utils/eventtypes";
 import { OtherPlayer, OwnPlayer } from "./Utils/playerclasses";
 import { Skins, Swords } from "./Utils/enums";
-import { MAP_COLOR, SCALE } from "./Utils/constants";
+import { SCALE, WATER_COLOR } from "./Utils/constants";
+import WorldMap from "./Utils/WorldMap";
+import { Game } from "./Utils/Game";
 
 //#endregion
 
 //#region initializing canvas
 
 const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
-const game = canvas.getContext("2d")!;
+const ctx = canvas.getContext("2d")!;
 function initializeCanvas() {
   canvas.width = window.innerWidth * SCALE;
   canvas.height = 0.9 * window.innerHeight * SCALE;
 }
-canvas.style.backgroundColor = MAP_COLOR;
+canvas.style.backgroundColor = WATER_COLOR;
 
 initializeCanvas();
 
 window.addEventListener("resize", initializeCanvas);
 
 function clearCanvas() {
-  game.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 //#endregion
@@ -32,13 +33,13 @@ function clearCanvas() {
 //#region initializing players
 
 const ownPlayer: OwnPlayer = new OwnPlayer(
-  0,
-  0,
-  Skins.AMOGUS,
+  10000,
+  10000,
+  Skins.NORMAL,
   Swords.PYTHAGORAS
 );
 
-let otherPlayers: OtherPlayer[] = [];
+let game: Game | undefined = undefined;
 
 //#endregion
 
@@ -57,13 +58,13 @@ sizeInput.addEventListener("change", () => {
 });
 
 //#endregion
-
 //#region Drawing canvas
 
 function renderGame() {
   clearCanvas();
-  ownPlayer.update(
-    game,
+  game!.render(
+    ownPlayer,
+    ctx,
     {
       ...keys,
       spacebarhold: keys.spacebardown
@@ -75,8 +76,6 @@ function renderGame() {
     },
     socket
   );
-
-  otherPlayers.forEach((p) => p.update(ownPlayer, game));
   socket.emit("playerChange", ownPlayer.serialize());
   requestAnimationFrame(renderGame);
 }
@@ -165,28 +164,29 @@ window.addEventListener("keyup", (e) => {
 
 socket.emit("playerJoined", ownPlayer.serialize());
 
-socket.on("mapInit", (others) => {
-  otherPlayers = others.map((other) => new OtherPlayer(other));
+socket.on("mapInit", (serializedMap) => {
+  game = new Game(serializedMap);
   renderGame();
 });
 
 socket.on("playerJoined", (otherPlayer) => {
-  otherPlayers.push(new OtherPlayer(otherPlayer));
+  game!.players.push(new OtherPlayer(otherPlayer));
 });
 
 socket.on("playerChange", (otherPlayer) => {
-  otherPlayers.find((p) => p.id === otherPlayer.id)!.setProperties(otherPlayer);
+  game!.players
+    .find((p) => p.id === otherPlayer.id)!
+    .setProperties(otherPlayer);
 });
 
 socket.on("playerLeft", (id) => {
-  otherPlayers = otherPlayers.filter((p) => p.id !== id);
+  game!.players = game!.players.filter((p) => p.id !== id);
 });
 
 socket.on("playerDamage", (damager, damage) => {
   ownPlayer.removeHealth(damage * damager.size);
   if (ownPlayer.health <= 0) {
     ownPlayer.reset();
-    alert("YOU DIED LOL");
   }
 });
 
