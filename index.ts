@@ -24,20 +24,18 @@ initializeCanvas();
 
 window.addEventListener("resize", initializeCanvas);
 
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
 //#endregion
 
 //#region initializing players
 
 const ownPlayer: OwnPlayer = new OwnPlayer(
-  10000,
-  10000,
-  Skins.NORMAL,
+  1000,
+  500,
+  Skins.AMOGUS,
   Swords.PYTHAGORAS
 );
+
+// ownPlayer.setSpeed(5);
 
 let game: Game | undefined = undefined;
 
@@ -53,7 +51,7 @@ nameInput.addEventListener("change", () => {
 
 const sizeInput = document.querySelector<HTMLInputElement>("#size")!;
 sizeInput.addEventListener("change", () => {
-  ownPlayer.size = parseInt(sizeInput.value);
+  ownPlayer.size = parseFloat(sizeInput.value);
   sizeInput.blur();
 });
 
@@ -61,7 +59,6 @@ sizeInput.addEventListener("change", () => {
 //#region Drawing canvas
 
 function renderGame() {
-  clearCanvas();
   game!.render(
     ownPlayer,
     ctx,

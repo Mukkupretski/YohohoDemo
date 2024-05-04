@@ -3,7 +3,7 @@ import WorldMap from "./WorldMap";
 import { OtherPlayer, OwnPlayer } from "./playerclasses";
 import { SerializedGame } from "./serialtypes";
 import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
-import { SAND_COLOR, MAP_COLOR, LINE_COLOR } from "./constants";
+import { SAND_COLOR, MAP_COLOR, LINE_COLOR, MAP_GRID_WIDTH } from "./constants";
 
 export class Game {
   id: string;
@@ -34,6 +34,8 @@ export class Game {
     spacebarCallback: () => void,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>
   ) {
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
     const scale = 1 / player.size;
     context.save();
     context.translate(
@@ -64,7 +66,7 @@ export class Game {
       -player.x * scale + context.canvas.width / 2,
       -player.y * scale + context.canvas.height / 2
     );
-    context.lineWidth = 10 * scale;
+    context.lineWidth = MAP_GRID_WIDTH * scale;
     context.strokeStyle = LINE_COLOR;
     for (let i = 0; i < this.map.size / 100; i++) {
       for (let j = 0; j < this.map.size / 100; j++) {
@@ -105,5 +107,13 @@ export class Game {
       el.update(player, context);
     });
     //TODO: Draw storm
+    //temp
+    context.save();
+    context.fillStyle = "black";
+    context.font = `30px Arial`;
+
+    context.fillText(`x: ${player.x}`, 10, 30);
+    context.fillText(`y: ${player.y}`, 10, 70);
+    context.restore();
   }
 }

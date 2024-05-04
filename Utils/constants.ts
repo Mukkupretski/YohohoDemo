@@ -20,5 +20,6 @@ export const IMAGE_PATH: string = "/Images";
 
 export const SCALE: number = 2;
 export const PLAYER_HEADER_PADDING: number = 10;
+export const MAP_GRID_WIDTH = 4;
 
 //#endregion

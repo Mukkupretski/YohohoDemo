@@ -206,6 +206,82 @@ export default class WorldMap {
 
     return map;
   }
+
+  static generateTestMap(size: number): SerializedWorldMap {
+    const map: SerializedWorldMap = {
+      grass: [],
+      staticBackground: [],
+      staticChanging: [],
+      staticForeground: [],
+      dynamicBackground: [],
+      dynamicForeground: [],
+      size: size,
+    };
+    map.grass.push({
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+    map.staticBackground.push({
+      x: 600,
+      y: 100,
+      width: 128,
+      height: 128,
+      thingType: ThingTypes.BUSH1,
+      rotation: 180,
+    });
+    map.staticBackground.push({
+      x: 1100,
+      y: 100,
+      width: 128,
+      height: 128,
+      thingType: ThingTypes.BUSH2,
+      rotation: 180,
+    });
+    map.staticBackground.push({
+      x: 1600,
+      y: 100,
+      width: 64,
+      height: 64,
+      thingType: ThingTypes.ROCK,
+      rotation: 180,
+    });
+    map.staticBackground.push({
+      x: 2100,
+      y: 100,
+      width: 256,
+      height: 128,
+      thingType: ThingTypes.TREASURE,
+      rotation: 180,
+    });
+    map.staticForeground.push({
+      x: 2600,
+      y: 100,
+      width: 512,
+      height: 512,
+      thingType: ThingTypes.TREE,
+      rotation: 180,
+    });
+    map.staticChanging.push({
+      x: 3100,
+      y: 100,
+      width: 784,
+      height: 784,
+      thingType: ThingTypes.HUT,
+      rotation: 180,
+    });
+    map.staticBackground.push({
+      x: 3600,
+      y: 100,
+      width: 32,
+      height: 32,
+      thingType: ThingTypes.COIN,
+      rotation: 180,
+    });
+    return map;
+  }
+
   static getRandomInteger(a: number, b: number) {
     //Get a random integer in the range [a, b]
     return Math.floor(Math.random() * (b - a + 1)) + a;

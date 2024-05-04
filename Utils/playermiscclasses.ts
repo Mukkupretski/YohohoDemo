@@ -27,7 +27,7 @@ export class PlayerHeader {
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     const scale = this.owner.size / player.size;
     context.save();
-    Thing.doTranslate(player, context, this.owner, this.owner.size);
+    Thing.doTranslate(player, context, this.owner);
     //How heights are calculated:
     //Player: 128px, gap: 10px, healthbar: 32px, gap: 10px,
     //And scaled by player width
@@ -105,7 +105,7 @@ export class Sword {
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     const scale = this.owner.size / player.size;
     context.save();
-    Thing.doTranslate(player, context, this.owner, this.owner.size);
+    Thing.doTranslate(player, context, this.owner);
     context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
     context.fillStyle = NO_RENDER_COLOR;
     //Hand: center, center of player edge, size: 64px

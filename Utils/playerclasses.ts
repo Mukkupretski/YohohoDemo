@@ -70,7 +70,7 @@ export abstract class Player {
     //Do actual drawing
     context.save();
 
-    Thing.doTranslate(player, context, this, this.size);
+    Thing.doTranslate(player, context, this);
     context.rotate((-this.rotation / 180) * Math.PI);
     if (this.image) {
       const skinpos = [this.skin % 4, Math.floor(this.skin / 4)];
@@ -109,6 +109,7 @@ export class OwnPlayer extends Player {
   dashPosis: [boolean, boolean];
   dashStart: [number, number];
   externalForces: [number, number];
+  speed: number;
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, 0, 100, "", swordskin);
     this.targetrotation = 0;
@@ -119,6 +120,7 @@ export class OwnPlayer extends Player {
     this.externalForces = [0, 0];
     this.dashAcc = 0;
     this.isAttacking = false;
+    this.speed = 1;
   }
   update(
     context: CanvasRenderingContext2D,
@@ -220,8 +222,8 @@ export class OwnPlayer extends Player {
         }
       }
     }
-    this.x += this.speedVector[0] * 10 + this.externalForces[0];
-    this.y += this.speedVector[1] * 10 + this.externalForces[0];
+    this.x += this.speedVector[0] * this.speed + this.externalForces[0];
+    this.y += this.speedVector[1] * this.speed + this.externalForces[0];
     this.draw(this, context);
   }
   applyExternalForce(force: [number, number], duration: number) {
@@ -231,6 +233,9 @@ export class OwnPlayer extends Player {
       this.externalForces[0] -= force[0];
       this.externalForces[1] -= force[1];
     }, 1000 * duration);
+  }
+  setSpeed(speed: number) {
+    this.speed = speed;
   }
   setSkin(skin: Skins): void {
     this.skin = skin;

@@ -72,10 +72,9 @@ export class Thing {
   static doTranslate(
     player: OwnPlayer,
     context: CanvasRenderingContext2D,
-    obj: Thing | Player | Obj,
-    size?: number
+    obj: Thing | Player | Obj
   ) {
-    const scale: number = (size ?? 1) / player.size;
+    const scale: number = 1 / player.size;
     //1. Put top corner to center
     //2. Put center of the object to center (the width of object is obj.width*scale so we divide that with 2 and same with height)
     //3. Move respectively to the own player's position (scaled by scale)
@@ -84,13 +83,9 @@ export class Thing {
     //Note that 2. and 5. cancel each other
     context.translate(
       //X
-      context.canvas.width / 2 +
-        (obj.width - obj.width * scale) / 2 +
-        (obj.x - player.x) * scale,
+      context.canvas.width / 2 + (obj.x - player.x) * scale,
       //Y
-      context.canvas.height / 2 +
-        (obj.height - obj.height * scale) / 2 +
-        (obj.y - player.y) * scale
+      context.canvas.height / 2 + (obj.y - player.y) * scale
     );
   }
   static getSerializedThing(thing: Thing): SerializedThing {
@@ -108,8 +103,8 @@ export class Thing {
     thing2: Thing | SerializedThing
   ): boolean {
     return (
-      (thing1.width + thing2.width) / 2 < Math.abs(thing1.x - thing2.x) &&
-      (thing1.height + thing2.height) / 2 < Math.abs(thing1.y - thing2.y)
+      (thing1.width + thing2.width) / 2 > Math.abs(thing1.x - thing2.x) &&
+      (thing1.height + thing2.height) / 2 > Math.abs(thing1.y - thing2.y)
     );
   }
 }
@@ -133,9 +128,9 @@ export abstract class Interactable extends Thing {
   }
   overlap(player: OwnPlayer): boolean {
     return (
-      (this.width / player.size + player.width) / 2 <
+      (this.width / player.size + player.width) / 2 >
         Math.abs(this.x - player.x) / player.size &&
-      (this.height / player.size + player.height) / 2 <
+      (this.height / player.size + player.height) / 2 >
         Math.abs(this.y - player.y) / player.size
     );
   }
@@ -144,8 +139,15 @@ export abstract class Interactable extends Thing {
 
 export abstract class LayerSwitcher extends Interactable {
   onForeground: boolean;
-  constructor(thingType: ThingTypes, x: number, y: number, rotation: number) {
-    super(thingType, x, y, 512, 512, rotation);
+  constructor(
+    thingType: ThingTypes,
+    width: number,
+    height: number,
+    x: number,
+    y: number,
+    rotation: number
+  ) {
+    super(thingType, width, height, x, y, rotation);
     this.onForeground = false;
   }
   abstract update(player: OwnPlayer, context: CanvasRenderingContext2D): void;
@@ -155,7 +157,7 @@ export class Hut extends LayerSwitcher {
   floorimg: CanvasImageSource | undefined;
   hutimg: CanvasImageSource | undefined;
   constructor(thing: SerializedThing) {
-    super(ThingTypes.HUT, thing.x, thing.y, thing.rotation);
+    super(ThingTypes.HUT, 784, 784, thing.x, thing.y, thing.rotation);
     const floorelem = document.createElement("img");
     floorelem.src = `${IMAGE_PATH}/${ThingTypes.HUTFLOOR}`;
     floorelem.onload = () => {
