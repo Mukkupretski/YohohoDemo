@@ -26,8 +26,6 @@ THIS IS COMPLETELY DIFFERENT HOW COULD IT BE?
 
 ## Todo (todo.md)
 
-## Todo
-
 **Things (Demo):**
 
 - Classes - √
