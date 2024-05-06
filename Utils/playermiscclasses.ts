@@ -249,7 +249,7 @@ export class Emote {
     const scale = this.owner.size / player.size;
     context.translate(
       (player.width / 2) * scale + 64 * scale,
-      (player.height / 2) * scale + 64 * scale
+      -(player.height / 2) * scale - 64 * scale
     );
     context.save();
     if (chatbubble) {

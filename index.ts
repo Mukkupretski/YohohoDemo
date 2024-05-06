@@ -5,7 +5,6 @@ import isInInput from "./isInInput";
 import { OtherPlayer, OwnPlayer } from "./Utils/playerclasses";
 import { Skins, Swords } from "./Utils/enums";
 import { SCALE, WATER_COLOR } from "./Utils/constants";
-import WorldMap from "./Utils/WorldMap";
 import { Game } from "./Utils/Game";
 
 //#endregion
@@ -168,6 +167,7 @@ document.addEventListener("keydown", (e) => {
   } else if (e.key == "3") {
     emoteId = 3;
   }
+  if (emoteId == 0) return;
   ownPlayer.setEmote(emoteId);
   socket.emit("emote", emoteId);
 });

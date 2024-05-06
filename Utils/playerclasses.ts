@@ -73,7 +73,7 @@ export abstract class Player {
     //Draw sword and header
     this.sword.update(player, context);
     this.playerheader.update(player, context);
-    if (this.emote) {
+    if (this.emote != undefined) {
       this.emote.update(player, context);
     }
     //Do actual drawing
@@ -112,7 +112,7 @@ export abstract class Player {
       this.emote = new Emote(id, this);
       setTimeout(() => {
         this.emote = undefined;
-      }, this.emote.animation.time * 1000);
+      }, this.emote.animation.time * 1000 + 1000);
     }
   }
 }
