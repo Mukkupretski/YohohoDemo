@@ -166,6 +166,8 @@ document.addEventListener("keydown", (e) => {
     emoteId = 2;
   } else if (e.key == "3") {
     emoteId = 3;
+  } else if (e.key == "4") {
+    emoteId = 4;
   }
   if (emoteId == 0) return;
   ownPlayer.setEmote(emoteId);

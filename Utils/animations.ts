@@ -19,7 +19,7 @@ export function getAnimationById(id: number): Animation {
       new AnimationPart(new MOVE(0, 20), 0.6, 0.3, EasingFunction.easeIn),
       new AnimationPart(new MOVE(0, -25), 0, 0.3, EasingFunction.easeOut),
       new AnimationPart(new SCALE(32, 32), 0, 0.3, EasingFunction.easeIn),
-      new AnimationPart(new SCALE(12, 12), 0.6, 0.2, EasingFunction.easeIn),
+      new AnimationPart(new SCALE(4, 4), 0.7, 0.2, EasingFunction.easeIn),
     ],
     { x: 0, y: 10, width: 24, height: 24, rotation: 0, opacity: 0 },
     `${IMAGE_PATH}/Emotes/fire.svg`
