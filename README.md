@@ -33,9 +33,10 @@ THIS IS COMPLETELY DIFFERENT HOW COULD IT BE?
 - Player to center, new rendering - √
 - Map generation
 - Swords - √
-- Fighting and dying
+- Fighting and dying - √
   - Swing and dash animation
-- Emotes
+  - Knockback
+- Emotes - √
 
 **Things (After demo):**
 
