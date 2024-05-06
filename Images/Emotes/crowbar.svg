@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="crowbar.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#000000"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#0da000"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="7.8211882"
+     inkscape:cx="14.767577"
+     inkscape:cy="33.754462"
+     inkscape:window-width="1920"
+     inkscape:window-height="974"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Taso 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#d50000;fill-opacity:0.00843883;stroke:#373737;stroke-width:2;stroke-dasharray:none;stroke-opacity:1"
+       d="M 9.61754,62.489723 C 21.406877,49.46335 12.43556,59.446007 16.451005,54.698726 25.4069,45.051172 26.267545,4.9075973 41.556563,1.4389647 c 9.941088,1.384775 8.899183,5.25588 10.695859,10.0899793"
+       id="path3086"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:#d50000;fill-opacity:0.00843883;stroke:#464646;stroke-width:0.4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.52619,62.406428 c 11.789337,-13.026373 2.81802,-3.043716 6.833465,-7.790997 8.955895,-9.647554 9.81654,-49.7911283 25.105558,-53.2597609 9.941088,1.384775 8.899183,5.25588 10.695859,10.0899799"
+       id="path3086-5"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="fill:#373737;fill-opacity:1;stroke:#373737;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+       d="M 51.366875,11.762919 50.727586,16.046155 53.029027,15.342937 51.9742,11.603096"
+       id="path9732" />
+    <path
+       style="fill:#373737;fill-opacity:1;stroke:#373737;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+       d="m 52.357773,10.803985 1.310543,4.37913 1.917867,-0.86304 -2.557156,-3.324303"
+       id="path9734" />
+  </g>
+</svg>

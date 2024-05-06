@@ -1,0 +1,14 @@
+<svg width='256' height='256'  xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <image x='0' y='0' xlink:href="./Hands/AMOGUSHAND.svg"></image>
+  <image x='64' y='0' xlink:href="./Hands/NORMALHAND.svg"></image>
+  <image x='128' y='0' xlink:href="./Hands/Pythagoras' hand.png"></image>
+  <image x='192' y='0' xlink:href="./Hands/CHARHAND.svg"></image>
+  <image x='0' y='64' xlink:href="./Hands/CHARHAND.svg"></image>
+  <image x='64' y='64' xlink:href="./Hands/CHARHAND.svg"></image>
+  <image x='128' y='64' xlink:href="./Hands/CHARHAND.svg"></image>
+  <image x='192' y='64' xlink:href="./Hands/GIGAHAND.svg"></image>
+  <image x='0' y='128' xlink:href="./Hands/CHARHAND.svg"></image>
+  <image x='64' y='128' xlink:href="./Hands/ROBLOXHAND.svg"></image>
+  <image x='128' y='128' xlink:href="./Hands/PINKHAND.svg"></image>
+  <image x='192' y='128' xlink:href="./Hands/GHOSTHAND.svg"></image>
+</svg>

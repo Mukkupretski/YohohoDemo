@@ -1,0 +1,16 @@
+<svg width='256' height='256'  xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <ellipse rx="128" ry="75" cx="128" cy="120" fill="#e9b37c" stroke="#000" stroke-width="2" />
+  <circle r="6" cx="95" cy="80" />
+  <circle r="6" cx="161" cy="80" />
+
+
+         <!-- Eyepatch -->
+        <path d="M0, 128 Q80,45,256,128 " fill="none" stroke-width="2" stroke="black" />
+    <!-- hair -->
+    <path d="M0,128 l20,45 l15,-18 l13,18 l20,-10 l5,12 l30,-7 l5,8 l2,-10 l20,4 l10,10 l5,-30 l20,15 l30, 10 l15,2 l10,13l23,-40 L256,128 l-30, -25 l-20,4 l-20, -20 l-15, 10 l-20, 3 l-15, -20 l-30, 15 l-6,-3 l-6, 9 l-40, -10 l-15,-15 l-10, 40 z" stroke="black" fill="brown" stroke-width="2" />
+
+    <path d="M80,90 Q95,30,110,90 L80,90 Z" fill="rgb(42,42,42)"  stroke="black" stroke-width="2"/>
+    <!-- mouth and eyebrow -->
+      <path d="M110,65 Q128,40,156,65" fill="black" />
+      <path d="M150,85 L175,95" fill="none" stroke-width="2" stroke="black" />
+</svg>

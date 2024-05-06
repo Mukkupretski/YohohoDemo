@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="GIGAHAND.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#000000"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#0da000"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="5.5304152"
+     inkscape:cx="5.9670022"
+     inkscape:cy="16.996915"
+     inkscape:window-width="1920"
+     inkscape:window-height="974"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <filter
+       inkscape:label="Cracked Glass"
+       inkscape:menu="Textures"
+       inkscape:menu-tooltip="Under a cracked glass"
+       style="color-interpolation-filters:sRGB;"
+       id="filter35629"
+       x="-0.18750001"
+       y="-0.18750001"
+       width="1.375"
+       height="1.375">
+      <feTurbulence
+         baseFrequency="0.1"
+         seed="50"
+         numOctaves="5"
+         result="result1"
+         type="fractalNoise"
+         id="feTurbulence35605" />
+      <feGaussianBlur
+         stdDeviation="4"
+         result="result7"
+         id="feGaussianBlur35607" />
+      <feDisplacementMap
+         result="result5"
+         in="SourceGraphic"
+         scale="20"
+         xChannelSelector="G"
+         in2="result7"
+         id="feDisplacementMap35609" />
+      <feComposite
+         result="result2"
+         operator="in"
+         in2="result1"
+         in="result5"
+         id="feComposite35611" />
+      <feGaussianBlur
+         stdDeviation="1"
+         result="result6"
+         id="feGaussianBlur35613" />
+      <feSpecularLighting
+         surfaceScale="-3"
+         result="result4"
+         specularConstant="3.5"
+         specularExponent="35"
+         in="result6"
+         id="feSpecularLighting35617">
+        <feDistantLight
+           elevation="45"
+           azimuth="225"
+           id="feDistantLight35615" />
+      </feSpecularLighting>
+      <feComposite
+         k1="1.7"
+         k3="0.7"
+         in2="result2"
+         in="result4"
+         operator="arithmetic"
+         result="result91"
+         id="feComposite35619" />
+      <feBlend
+         result="fbSourceGraphic"
+         mode="multiply"
+         in2="result91"
+         id="feBlend35621" />
+      <feComposite
+         in2="fbSourceGraphic"
+         in="fbSourceGraphic"
+         result="result2"
+         operator="arithmetic"
+         id="feComposite35623" />
+      <feComposite
+         in="result2"
+         result="result4"
+         operator="arithmetic"
+         k2="2"
+         k3="2"
+         in2="fbSourceGraphic"
+         id="feComposite35625" />
+      <feBlend
+         mode="screen"
+         in="result4"
+         in2="result4"
+         id="feBlend35627" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Taso 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#454545;stroke:#625e55;stroke-width:0;stroke-dasharray:none;filter:url(#filter35629);stroke-opacity:1;fill-opacity:1"
+       id="path32913"
+       cx="32"
+       cy="32"
+       r="32" />
+  </g>
+</svg>

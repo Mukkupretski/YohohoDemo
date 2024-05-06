@@ -1,0 +1,5 @@
+<svg width='256' height='256'  xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <ellipse rx="128" ry="75" cx="128" cy="120" fill="#e9b37c" stroke="#000" stroke-width="2" />
+  <circle r="6" cx="95" cy="90" />
+  <circle r="6" cx="161" cy="90" />
+</svg>

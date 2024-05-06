@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="GHOSTHAND.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#000000"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#0da000"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="2.7652076"
+     inkscape:cx="-86.611941"
+     inkscape:cy="3.616365"
+     inkscape:window-width="1920"
+     inkscape:window-height="974"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient30704">
+      <stop
+         style="stop-color:#fcfcfa;stop-opacity:1;"
+         offset="0"
+         id="stop30700" />
+      <stop
+         style="stop-color:#a4a46a;stop-opacity:1;"
+         offset="1"
+         id="stop30702" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient30704"
+       id="radialGradient30706"
+       cx="32.348026"
+       cy="30.558016"
+       fx="32.348026"
+       fy="30.558016"
+       r="32"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-1.775198,0.33497574,-0.32728326,-1.7343965,99.773305,72.721926)" />
+  </defs>
+  <g
+     inkscape:label="Taso 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:url(#radialGradient30706);stroke:#a4a096;stroke-width:6;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       id="path29549"
+       cx="32"
+       cy="32"
+       r="29" />
+  </g>
+</svg>

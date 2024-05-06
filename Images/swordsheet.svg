@@ -1,0 +1,6 @@
+<svg width='1024' height='128'  xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <image x='0' y='0' xlink:href="./Swords/Pythagoras_sword.png"></image>
+  <image x='0' y='64' xlink:href="./Swords/Pythagoras_sword_glowing.png"></image>
+  <image x='256' y='0' xlink:href="./Swords/SHARK.svg"></image>
+  <image x='256' y='64' xlink:href="./Swords/SHARKCHARGE.svg"></image>
+</svg>
