@@ -1,6 +1,12 @@
 import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 import { Skins, Swords } from "./enums";
-import { OtherSword, OwnSword, PlayerHeader, Sword } from "./playermiscclasses";
+import {
+  Emote,
+  OtherSword,
+  OwnSword,
+  PlayerHeader,
+  Sword,
+} from "./playermiscclasses";
 import { Thing } from "./thingclasses";
 import {
   SerializedOtherPlayer,
@@ -23,7 +29,7 @@ export abstract class Player {
   skin: Skins;
   sword: Sword;
   playerheader: PlayerHeader;
-
+  emote: Emote | undefined;
   constructor(
     x: number,
     y: number,
@@ -67,6 +73,9 @@ export abstract class Player {
     //Draw sword and header
     this.sword.update(player, context);
     this.playerheader.update(player, context);
+    if (this.emote) {
+      this.emote.update(player, context);
+    }
     //Do actual drawing
     context.save();
 
@@ -97,6 +106,14 @@ export abstract class Player {
       );
     }
     context.restore();
+  }
+  setEmote(id: number) {
+    if (!this.emote) {
+      this.emote = new Emote(id, this);
+      setTimeout(() => {
+        this.emote = undefined;
+      }, this.emote.animation.time * 1000);
+    }
   }
 }
 

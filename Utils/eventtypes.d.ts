@@ -10,6 +10,7 @@ export type ServerToClientEvents = {
   playerJoined: (player: SerializedOtherPlayer) => void;
   mapInit: (map: SerializedGame) => void;
   playerLeft: (id: string) => void;
+  emote: (emoteId: number, id: string) => void;
 };
 export type ClientToServerEvents = {
   playerJoined: (player: SerializedPlayer) => void;
@@ -20,4 +21,5 @@ export type ClientToServerEvents = {
     power: number,
     dashStart: [number, number]
   ) => void;
+  emote: (emoteId: number) => void;
 };

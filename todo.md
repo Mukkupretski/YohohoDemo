@@ -35,9 +35,9 @@
   - Hand: 64x64px
 - SwordSheets: 4 swords, 2 versions (basic and glow) -> (1024x128px): swordsheet.png
   - Sword: 256x64
-- Chatbubble: 256x256px chatbubble.png
+- Chatbubble: 128x128px chatbubble.png
 - Emotesheet: 512x512px emotesheet.png
-  - Emote: 128x128px
+  - Emote: max 128x128px
   - 2 moving parts
 - Coin: 32x32px - √ coin.png
 - Treasure: 256x128px - √ treasure.png

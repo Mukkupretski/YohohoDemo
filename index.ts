@@ -157,6 +157,23 @@ window.addEventListener("keyup", (e) => {
 
 //#endregion
 
+//#region Player emotes
+
+document.addEventListener("keydown", (e) => {
+  let emoteId = 0;
+  if (e.key == "1") {
+    emoteId = 1;
+  } else if (e.key == "2") {
+    emoteId = 2;
+  } else if (e.key == "3") {
+    emoteId = 3;
+  }
+  ownPlayer.setEmote(emoteId);
+  socket.emit("emote", emoteId);
+});
+
+//#endregion
+
 //#region Socket events
 
 socket.emit("playerJoined", ownPlayer.serialize());
@@ -164,6 +181,10 @@ socket.emit("playerJoined", ownPlayer.serialize());
 socket.on("mapInit", (serializedMap) => {
   game = new Game(serializedMap);
   renderGame();
+});
+
+socket.on("emote", (emoteId, id) => {
+  game!.players.find((p) => p.id === id)?.setEmote(emoteId);
 });
 
 socket.on("playerJoined", (otherPlayer) => {

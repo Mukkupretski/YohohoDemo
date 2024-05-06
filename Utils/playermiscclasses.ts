@@ -7,6 +7,8 @@ import {
   PLAYER_HEADER_PADDING,
 } from "./constants";
 import { SerializedSword } from "./serialtypes";
+import { Animation } from "./animationlib";
+import { chatbubble, getAnimationById } from "./animations";
 
 export type Obj = {
   width: number;
@@ -231,5 +233,42 @@ export class OtherSword extends Sword {
     swordopacity: number
   ) {
     super(owner, swordskin, angle, swordopacity);
+  }
+}
+
+export class Emote {
+  animation: Animation;
+  owner: Player;
+  constructor(id: number, player: Player) {
+    this.animation = getAnimationById(id);
+    this.owner = player;
+  }
+  draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
+    context.save();
+    Thing.doTranslate(player, context, this.owner);
+    const scale = this.owner.size / player.size;
+    context.translate(
+      (player.width / 2) * scale + 64 * scale,
+      (player.height / 2) * scale + 64 * scale
+    );
+    context.save();
+    if (chatbubble) {
+      context.drawImage(
+        chatbubble,
+        -64 * scale,
+        -64 * scale,
+        128 * scale,
+        128 * scale
+      );
+    } else {
+      context.fillStyle = NO_RENDER_COLOR;
+      context.fillRect(-64 * scale, -64 * scale, 128 * scale, 128 * scale);
+    }
+    context.restore();
+    this.animation.update(context, scale);
+    context.restore();
+  }
+  update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
+    this.draw(player, context);
   }
 }
