@@ -56,7 +56,7 @@ export abstract class Player {
     }
     this.name = name;
     const skinImage = document.createElement("img");
-    skinImage.src = `${IMAGE_PATH}/skinsheet.png`;
+    skinImage.src = `${IMAGE_PATH}/skinsheet.svg`;
     skinImage.onload = () => {
       this.image = skinImage;
     };

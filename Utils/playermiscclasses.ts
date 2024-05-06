@@ -91,12 +91,12 @@ export class Sword {
     this.swordopacity = swordopacity;
     this.owner = owner;
     const handel = document.createElement("img");
-    handel.src = `${IMAGE_PATH}/handsheet.png`;
+    handel.src = `${IMAGE_PATH}/handsheet.svg`;
     handel.onload = () => {
       this.handimg = handel;
     };
     const swordel = document.createElement("img");
-    swordel.src = `${IMAGE_PATH}/swordsheet.png`;
+    swordel.src = `${IMAGE_PATH}/swordsheet.svg`;
     swordel.onload = () => {
       this.swordimg = swordel;
     };
