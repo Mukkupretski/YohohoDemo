@@ -118,7 +118,8 @@ export function getAnimationById(id: number): Animation {
       context.closePath();
     }
   );
-
+  //#endregion
+  //#region medic
   const medic = new AnimationImageObject(
     [new AnimationPart(new SCALE(48, 48), 0, 0.5, EasingFunction.easeOut)],
     {
@@ -131,7 +132,8 @@ export function getAnimationById(id: number): Animation {
     },
     `${IMAGE_PATH}/Emotes/cross.svg`
   );
-
+  //#endregion
+  //#region crowbar
   const crowbar = new AnimationImageObject(
     [
       new AnimationPart(new ROTATE(-10), 0, 0.3, EasingFunction.easeOut),
@@ -160,6 +162,92 @@ export function getAnimationById(id: number): Animation {
       context.fillRect(0, 0, obj.width * scale, obj.height * scale);
     }
   );
+  //#endregion
+  //#region amogus
+  const amogus = new AnimationImageObject(
+    [],
+    { x: 0, y: -10, width: 64, height: 64, rotation: 0, opacity: 1 },
+    `${IMAGE_PATH}/Emotes/amogus.svg`
+  );
+  const amogushand = new AnimationImageObject(
+    [
+      new AnimationPart(new MOVE(-35, 5), 0, 0.2, EasingFunction.easeOut),
+      new AnimationPart(new MOVE(-25, 5), 1.1, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-35, 5), 1.2, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-25, 15), 1.6, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-35, 5), 1.7, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-40, -4), 2.15, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-35, 5), 2.25, 0.1, EasingFunction.easeInOut),
+    ],
+    { x: -35, y: 11, width: 24, height: 24, rotation: 0, opacity: 1 },
+    `${IMAGE_PATH}/Emotes/amogushand.svg`
+  );
+  const amogusknife = new AnimationImageObject(
+    [
+      new AnimationPart(new SCALE(48, 48), 0, 0.2, EasingFunction.easeOut),
+      new AnimationPart(new MOVE(-35, -11), 0, 0.2, EasingFunction.easeOut),
+      new AnimationPart(new ROTATE(-90), 0.8, 0.3, EasingFunction.easeOut),
+      new AnimationPart(new MOVE(-15, -2), 0.8, 0.15, EasingFunction.easeIn),
+      new AnimationPart(new MOVE(-13, 11), 0.95, 0.15, EasingFunction.easeOut),
+      new AnimationPart(new MOVE(-3, 11), 1.1, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-13, 11), 1.2, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-13, 13), 1.3, 0.3, EasingFunction.easeInOut),
+      new AnimationPart(new ROTATE(-105), 1.3, 0.3, EasingFunction.easeOut),
+      new AnimationPart(new MOVE(-3, 21), 1.6, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-13, 11), 1.7, 0.1, EasingFunction.easeInOut),
+      new AnimationPart(new ROTATE(15), 1.8, 0.3, EasingFunction.easeInOut),
+      new AnimationPart(new MOVE(-20, -10), 1.8, 0.15, EasingFunction.easeIn),
+      new AnimationPart(new MOVE(-35, -11), 1.95, 0.15, EasingFunction.easeOut),
+      new AnimationPart(
+        new MOVE(-40, -20),
+        2.15,
+        0.1,
+        EasingFunction.easeInOut
+      ),
+      new AnimationPart(
+        new MOVE(-35, -11),
+        2.25,
+        0.1,
+        EasingFunction.easeInOut
+      ),
+    ],
+    { x: -35, y: 10, width: 36, height: 12, rotation: 0, opacity: 1 },
+    `${IMAGE_PATH}/Emotes/knife.svg`
+  );
+  const amogusEye = new AnimationPathObject(
+    [
+      new AnimationPart(new FADE(1), 0, 0.4, EasingFunction.easeIn),
+      new AnimationPart(new FADE(0), 2.4, 0.1, EasingFunction.easeOut),
+    ],
+    { x: -5.8, y: -8.6, width: 25, height: 6, rotation: 0, opacity: 0 },
+    (context, scale, obj) => {
+      const grd = context.createRadialGradient(
+        obj.x * scale,
+        obj.y * scale,
+        0,
+        obj.x * scale,
+        obj.y * scale,
+        (obj.width / 2) * scale
+      );
+      grd.addColorStop(0, "red");
+      grd.addColorStop(1, "rgba(0,0,0,0)");
+      context.fillStyle = grd;
+      context.beginPath();
+      context.ellipse(
+        obj.x * scale,
+        obj.y * scale,
+        (obj.width / 2) * scale,
+        (obj.height / 2) * scale,
+        0,
+        0,
+        2 * Math.PI,
+        false
+      );
+      context.fill();
+      context.closePath();
+    }
+  );
+  //#endregion
 
   switch (id) {
     case 1:
@@ -168,6 +256,8 @@ export function getAnimationById(id: number): Animation {
       return new Animation([medic]);
     case 3:
       return new Animation([crowbar, wall]);
+    case 4:
+      return new Animation([amogus, amogusknife, amogushand, amogusEye]);
     default:
       return new Animation([]);
   }
