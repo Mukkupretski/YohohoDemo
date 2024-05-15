@@ -7,6 +7,7 @@ import {
 export type ServerToClientEvents = {
   playerChange: (player: SerializedOtherPlayer) => void;
   playerDamage: (damager: SerializedOtherPlayer, damage: number) => void;
+  playerForce: (vector: [number, number], duration: number) => void;
   playerJoined: (player: SerializedOtherPlayer) => void;
   mapInit: (map: SerializedGame) => void;
   playerLeft: (id: string) => void;

@@ -94,7 +94,7 @@ export class Game {
     this.players.forEach((p) => {
       p.update(player, context);
     });
-    player.update(context, keys, spacebarCallback, socket);
+    player.update(context, keys, spacebarCallback, socket, this.map);
     this.map.staticChanging
       .filter((el) => el.onForeground)
       .forEach((el) => {

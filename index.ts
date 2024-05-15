@@ -114,11 +114,7 @@ window.addEventListener("keydown", (e) => {
       keys.s = true;
       break;
     case " ":
-      if (
-        !keys.spacebardown &&
-        !ownPlayer.isAttacking &&
-        ownPlayer.dashAcc == 0
-      ) {
+      if (!keys.spacebardown && !ownPlayer.isAttacking && !ownPlayer.dashEnd) {
         keys.spacebardown = new Date().getTime();
       }
   }
@@ -143,11 +139,7 @@ window.addEventListener("keyup", (e) => {
       keys.s = false;
       break;
     case " ":
-      if (
-        !ownPlayer.isAttacking &&
-        ownPlayer.dashAcc == 0 &&
-        keys.spacebardown
-      ) {
+      if (!ownPlayer.isAttacking && !ownPlayer.dashEnd && keys.spacebardown) {
         keys.spacebartime = new Date().getTime() - keys.spacebardown;
         keys.spacebardown = undefined;
       }
@@ -208,6 +200,9 @@ socket.on("playerDamage", (damager, damage) => {
   if (ownPlayer.health <= 0) {
     ownPlayer.reset();
   }
+});
+socket.on("playerForce", (force, duration) => {
+  ownPlayer.applyExternalForce(force, duration);
 });
 
 //#endregion

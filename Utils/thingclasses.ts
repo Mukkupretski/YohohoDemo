@@ -35,11 +35,13 @@ export class Thing {
     canvas: HTMLCanvasElement,
     obj: Player | Thing | Obj
   ): boolean {
+    let scale = player.size;
+    if (obj instanceof Player) {
+      scale *= obj.size;
+    }
     return (
-      Math.abs(player.x - obj.x) - obj.width / 2 <
-        (player.size * canvas.width) / 2 &&
-      Math.abs(player.y - obj.y) - obj.height / 2 <
-        (player.size * canvas.height) / 2
+      Math.abs(player.x - obj.x) - obj.width / 2 < (scale * canvas.width) / 2 &&
+      Math.abs(player.y - obj.y) - obj.height / 2 < (scale * canvas.height) / 2
     );
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {

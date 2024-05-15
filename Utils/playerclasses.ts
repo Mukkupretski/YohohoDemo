@@ -1,12 +1,7 @@
 import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 import { Skins, Swords } from "./enums";
-import {
-  Emote,
-  OtherSword,
-  OwnSword,
-  PlayerHeader,
-  Sword,
-} from "./playermiscclasses";
+import { Emote, PlayerHeader } from "./playermiscclasses";
+import { Sword, OwnSword } from "./weaponclasses";
 import { Thing } from "./thingclasses";
 import {
   SerializedOtherPlayer,
@@ -15,6 +10,8 @@ import {
 } from "./serialtypes";
 import { Socket } from "socket.io-client";
 import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
+import { EasingFunction } from "./animationlib";
+import WorldMap from "./WorldMap";
 
 export abstract class Player {
   rotation: number;
@@ -51,8 +48,8 @@ export abstract class Player {
     this.rotation = rotation;
     this.health = health;
     if (swordprops) {
-      this.sword = new OtherSword(
-        this as unknown as OtherPlayer,
+      this.sword = new Sword(
+        this,
         swordskin,
         swordprops.angle,
         swordprops.swordopacity
@@ -71,10 +68,10 @@ export abstract class Player {
     if (!Thing.isInscreen(player, context.canvas, this)) return;
     const scale = this.size / player.size;
     //Draw sword and header
-    this.sword.update(player, context);
-    this.playerheader.update(player, context);
+    this.sword.draw(player, context);
+    this.playerheader.draw(player, context);
     if (this.emote != undefined) {
-      this.emote.update(player, context);
+      this.emote.draw(player, context);
     }
     //Do actual drawing
     context.save();
@@ -120,24 +117,27 @@ export abstract class Player {
 export class OwnPlayer extends Player {
   targetrotation: number;
   coins: number;
-  dashAcc: number;
   isAttacking: boolean;
   speedVector: [number, number];
-  dashPosis: [boolean, boolean];
-  dashStart: [number, number];
+  dashEnd?: [number, number];
+  dashStart: [number, number, number];
   externalForces: [number, number];
   speed: number;
+  lastUpdate: number;
+  power: number;
+  timeouts: ReturnType<typeof setTimeout>[];
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, 0, 100, "", swordskin);
     this.targetrotation = 0;
     this.coins = 0;
     this.speedVector = [0, 0];
-    this.dashPosis = [false, false];
-    this.dashStart = [0, 0];
+    this.dashStart = [0, 0, 0];
     this.externalForces = [0, 0];
-    this.dashAcc = 0;
     this.isAttacking = false;
     this.speed = 1;
+    this.lastUpdate = Date.now();
+    this.power = 0;
+    this.timeouts = [];
   }
   update(
     context: CanvasRenderingContext2D,
@@ -150,49 +150,54 @@ export class OwnPlayer extends Player {
       spacebarhold: number;
     },
     spacebarCallback: () => void,
-    socket: Socket<ServerToClientEvents, ClientToServerEvents>
+    socket: Socket<ServerToClientEvents, ClientToServerEvents>,
+    map: WorldMap
   ): void {
+    const deltaTime = (Date.now() - this.lastUpdate) / 1000;
+    let shouldApplyExternalForce = true;
+    this.lastUpdate = Date.now();
     //Check if spacebar was pressed and there is no current spacebar action
 
-    if (keys.spacebartime != 0 && !this.isAttacking && this.dashAcc == 0) {
-      //Swing attack if time under 500 ms
-      if (keys.spacebartime < 500) {
+    if (keys.spacebartime != 0 && !this.isAttacking && !this.dashEnd) {
+      //Swing attack if time under 300 ms
+      if (keys.spacebartime < 300) {
         this.isAttacking = true;
         (this.sword as unknown as OwnSword).swing();
         //Geometry dash attack
       } else {
-        const power = Math.min(keys.spacebartime / 1000, 2) * 80;
-        this.speedVector = [
-          power * Math.cos(((this.rotation + 90) / 180) * Math.PI),
-          //Flipping y because "up" (positive direction) is actually down in the canvas
-          -power * Math.sin(((this.rotation + 90) / 180) * Math.PI),
+        this.power = Math.min(keys.spacebartime / 1000, 2) * 40;
+        const targetDistance: number = 20 * this.power;
+        this.dashStart = [this.x, this.y, Date.now()];
+        this.dashEnd = [
+          this.x +
+            targetDistance * Math.cos(((this.rotation + 90) / 180) * Math.PI),
+          this.y -
+            targetDistance * Math.sin(((this.rotation + 90) / 180) * Math.PI),
         ];
+        console.log(this.dashEnd);
         (this.sword as unknown as OwnSword).swing();
-        this.dashPosis = [this.speedVector[0] > 0, this.speedVector[1] > 0];
-        this.dashAcc = power / 8;
-        this.dashStart = [this.x, this.y];
       }
       spacebarCallback();
     }
     //Slowing dash
-    if (this.dashAcc != 0) {
-      this.speedVector[0] +=
-        -this.dashAcc * Math.cos(((this.rotation + 90) / 180) * Math.PI);
-      this.speedVector[1] +=
-        this.dashAcc * Math.sin(((this.rotation + 90) / 180) * Math.PI);
+    if (this.dashEnd) {
+      shouldApplyExternalForce = false;
+      const easing = EasingFunction.easeOut(
+        (Date.now() - this.dashStart[2]) / 1000,
+        0.125
+      );
+      this.x = this.dashStart[0] * (1 - easing) + this.dashEnd[0] * easing;
+      this.y = this.dashStart[1] * (1 - easing) + this.dashEnd[1] * easing;
       //Stopping dash when slow enough
-      if (
-        (this.speedVector[0] > 0 !== this.dashPosis[0] ||
-          this.speedVector[0] == 0) &&
-        (this.speedVector[1] > 0 !== this.dashPosis[1] ||
-          this.speedVector[1] == 0)
-      ) {
-        socket.emit("dash", this.serialize(), this.dashAcc * 4, this.dashStart);
+      if ((Date.now() - this.dashStart[2]) / 1000 >= 0.125) {
+        socket.emit("dash", this.serialize(), this.power, [
+          this.dashStart[0],
+          this.dashStart[1],
+        ]);
         socket.emit("swing", this.serialize(), "dash");
-        this.dashAcc = 0;
+        this.dashEnd = undefined;
       }
     } else if (this.isAttacking) {
-      this.speedVector = [0, 0];
       if ((this.sword as unknown as OwnSword).direction === "static") {
         socket.emit("swing", this.serialize(), "swing");
         this.isAttacking = false;
@@ -229,30 +234,53 @@ export class OwnPlayer extends Player {
           this.rotation =
             (this.rotation +
               Math.sign(this.targetrotation - this.rotation) *
-                (Math.abs(this.rotation - this.targetrotation) > 180
-                  ? -5
-                  : 5)) %
+                (Math.abs(this.rotation - this.targetrotation) > 180 ? -1 : 1) *
+                deltaTime *
+                250) %
             360;
           if (this.rotation < 0) {
             this.rotation += 360;
           }
         }
       }
+      this.x += this.speedVector[0] * this.speed * deltaTime * 60;
+      this.y += this.speedVector[1] * this.speed * deltaTime * 60;
     }
-    this.x += this.speedVector[0] * this.speed + this.externalForces[0];
-    this.y += this.speedVector[1] * this.speed + this.externalForces[0];
+    if (shouldApplyExternalForce) {
+      this.x += this.externalForces[0] * deltaTime;
+
+      this.y += this.externalForces[1] * deltaTime;
+    }
+    (this.sword as unknown as OwnSword).update(deltaTime);
+    this.returnToMap(map);
     this.draw(this, context);
   }
   applyExternalForce(force: [number, number], duration: number) {
     this.externalForces[0] += force[0];
     this.externalForces[1] += force[1];
-    setTimeout(() => {
-      this.externalForces[0] -= force[0];
-      this.externalForces[1] -= force[1];
-    }, 1000 * duration);
+    this.timeouts.push(
+      setTimeout(() => {
+        this.externalForces[0] -= force[0];
+        this.externalForces[1] -= force[1];
+      }, 1000 * duration)
+    );
   }
   setSpeed(speed: number) {
     this.speed = speed;
+  }
+  returnToMap(map: WorldMap) {
+    if (this.x < (this.width * this.size) / 2) {
+      this.x = (this.width * this.size) / 2;
+    }
+    if (this.y < (this.height * this.size) / 2) {
+      this.y = (this.height * this.size) / 2;
+    }
+    if (this.x > map.size - (this.width * this.size) / 2) {
+      this.x = map.size - (this.width * this.size) / 2;
+    }
+    if (this.y > map.size - (this.height * this.size) / 2) {
+      this.y = map.size - (this.height * this.size) / 2;
+    }
   }
   setSkin(skin: Skins): void {
     this.skin = skin;
@@ -268,12 +296,16 @@ export class OwnPlayer extends Player {
     this.health -= amount;
   }
   reset(): void {
-    this.dashAcc = 0;
+    this.timeouts.forEach((t) => {
+      clearTimeout(t);
+    });
+    this.externalForces = [0, 0];
+    this.dashEnd = undefined;
     this.isAttacking = false;
     this.size = 1;
     (this.sword as unknown as OwnSword).reset();
-    this.x = 10000;
-    this.y = 10000;
+    this.x = 1000;
+    this.y = 500;
     this.health = 100;
   }
   serialize(): SerializedPlayer {
