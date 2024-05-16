@@ -1,58 +1,13 @@
+import { Socket } from "socket.io-client";
 import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
 import { Swords } from "./enums";
-import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
+import { Item, OwnItem } from "./itemclasses";
+import { OwnPlayer, Player } from "./playerclasses";
 import { SerializedSword } from "./serialtypes";
-import { Thing } from "./thingclasses";
+import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
+import { EasingFunction } from "./animationlib";
 
-export abstract class Weapon {
-  owner: Player;
-  angle: number;
-  handsize: number;
-  handimg: CanvasImageSource | undefined;
-  constructor(owner: Player, angle: number) {
-    this.angle = angle;
-    this.owner = owner;
-    this.handsize = 64;
-    const handel = document.createElement("img");
-    handel.src = `${IMAGE_PATH}/handsheet.svg`;
-    handel.onload = () => {
-      this.handimg = handel;
-    };
-  }
-  abstract draw(player: OwnPlayer, context: CanvasRenderingContext2D): void;
-
-  drawHandAndTranlate(player: OwnPlayer, context: CanvasRenderingContext2D) {
-    const scale = this.owner.size / player.size;
-    context.save();
-    Thing.doTranslate(player, context, this.owner);
-    context.rotate(((this.angle - this.owner.rotation) / 180) * Math.PI);
-    context.fillStyle = NO_RENDER_COLOR;
-    //Hand: center, center of player edge, size: 64px
-    if (this.handimg) {
-      const skinpos = [this.owner.skin % 4, Math.floor(this.owner.skin / 4)];
-      context.drawImage(
-        this.handimg,
-        skinpos[0] * 64,
-        skinpos[1] * 64,
-        64,
-        64,
-        (-this.owner.width / 2 - this.handsize / 2) * scale,
-        (-this.handsize / 2) * scale,
-        this.handsize * scale,
-        this.handsize * scale
-      );
-    } else {
-      context.fillRect(
-        (-this.owner.width / 2 - this.handsize / 2) * scale,
-        (-this.handsize / 2) * scale,
-        this.handsize * scale,
-        this.handsize * scale
-      );
-    }
-  }
-}
-
-export class Sword extends Weapon {
+export class Sword extends Item {
   swordimg: CanvasImageSource | undefined;
   swordopacity: number;
   swordskin: Swords;
@@ -134,12 +89,20 @@ export class Sword extends Weapon {
   }
 }
 
-export class OwnSword extends Sword {
+export class OwnSword extends Sword implements OwnItem {
   direction: "static" | "left" | "right";
-
+  dashEnd?: [number, number];
+  dashStart: [number, number, number];
+  owner: OwnPlayer;
+  isAttacking: boolean;
+  power: number;
   constructor(owner: OwnPlayer, swordskin: Swords) {
     super(owner, swordskin, 30, 0);
     this.direction = "static";
+    this.owner = owner;
+    this.power = 0;
+    this.isAttacking = false;
+    this.dashStart = [0, 0, 0];
   }
 
   reset(): void {
@@ -154,8 +117,76 @@ export class OwnSword extends Sword {
       this.direction = "left";
     }
   }
+  preventsExternalForces() {
+    return this.isAttacking || this.dashEnd != undefined;
+  }
+  preventsSwitchingItem() {
+    return this.isAttacking || this.dashEnd != undefined;
+  }
+  preventsMovement() {
+    return this.isAttacking || this.dashEnd != undefined;
+  }
+  preventsSpacebarHold() {
+    return this.isAttacking || this.dashEnd != undefined;
+  }
+  update(
+    deltaTime: number,
+    keys: Keys,
+    spacebarCallback: () => void,
+    socket: Socket<ServerToClientEvents, ClientToServerEvents>
+  ) {
+    //Check if spacebar was pressed and there is no current spacebar action
 
-  update(deltaTime: number) {
+    if (keys.spacebartime != 0 && !this.isAttacking && !this.dashEnd) {
+      //Swing attack if time under 300 ms
+      if (keys.spacebartime < 300) {
+        this.isAttacking = true;
+        this.swing();
+        //Geometry dash attack
+      } else {
+        this.power = Math.min(keys.spacebartime / 1000, 2) * 40;
+        const targetDistance: number = 20 * this.power;
+        this.dashStart = [this.owner.x, this.owner.y, Date.now()];
+        this.dashEnd = [
+          this.owner.x +
+            targetDistance *
+              Math.cos(((this.owner.rotation + 90) / 180) * Math.PI),
+          this.owner.y -
+            targetDistance *
+              Math.sin(((this.owner.rotation + 90) / 180) * Math.PI),
+        ];
+        this.swing();
+      }
+      spacebarCallback();
+    }
+    //Slowing dash
+    if (this.dashEnd) {
+      const easing = EasingFunction.easeOut(
+        (Date.now() - this.dashStart[2]) / 1000,
+        0.125
+      );
+      this.owner.x =
+        this.dashStart[0] * (1 - easing) + this.dashEnd[0] * easing;
+      this.owner.y =
+        this.dashStart[1] * (1 - easing) + this.dashEnd[1] * easing;
+      //Stopping dash when slow enough
+      if ((Date.now() - this.dashStart[2]) / 1000 >= 0.125) {
+        socket.emit("dash", this.owner.serialize(), this.power, [
+          this.dashStart[0],
+          this.dashStart[1],
+        ]);
+        socket.emit("swing", this.owner.serialize(), "dash");
+        this.dashEnd = undefined;
+      }
+    } else if (this.isAttacking) {
+      if (this.direction === "static") {
+        socket.emit("swing", this.owner.serialize(), "swing");
+        this.isAttacking = false;
+      }
+    }
+    if (!this.preventsSpacebarHold()) {
+      this.swordopacity = Math.min(keys.spacebarhold / 1000, 2) / 2;
+    }
     if (this.direction !== "static") {
       if (this.angle >= 140 && this.direction == "right") {
         this.direction = "static";

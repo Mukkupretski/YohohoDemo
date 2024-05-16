@@ -23,14 +23,7 @@ export class Game {
   render(
     player: OwnPlayer,
     context: CanvasRenderingContext2D,
-    keys: {
-      w: boolean;
-      d: boolean;
-      s: boolean;
-      a: boolean;
-      spacebartime: number;
-      spacebarhold: number;
-    },
+    keys: Keys,
     spacebarCallback: () => void,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>
   ) {

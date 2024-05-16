@@ -12,6 +12,7 @@ import { Socket } from "socket.io-client";
 import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
 import { EasingFunction } from "./animationlib";
 import WorldMap from "./WorldMap";
+import { Item, OwnItem } from "./itemclasses";
 
 export abstract class Player {
   rotation: number;
@@ -117,96 +118,41 @@ export abstract class Player {
 export class OwnPlayer extends Player {
   targetrotation: number;
   coins: number;
-  isAttacking: boolean;
+
   speedVector: [number, number];
-  dashEnd?: [number, number];
-  dashStart: [number, number, number];
+
   externalForces: [number, number];
   speed: number;
   lastUpdate: number;
-  power: number;
   timeouts: ReturnType<typeof setTimeout>[];
+  inventory: (Item & OwnItem)[];
+  inventoryIndex: number;
   constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
     super(x, y, 1, skin, 0, 100, "", swordskin);
     this.targetrotation = 0;
     this.coins = 0;
     this.speedVector = [0, 0];
-    this.dashStart = [0, 0, 0];
     this.externalForces = [0, 0];
-    this.isAttacking = false;
+
     this.speed = 1;
     this.lastUpdate = Date.now();
-    this.power = 0;
+
     this.timeouts = [];
+    this.inventory = [];
+    this.inventoryIndex = 0;
   }
   update(
     context: CanvasRenderingContext2D,
-    keys: {
-      w: boolean;
-      d: boolean;
-      s: boolean;
-      a: boolean;
-      spacebartime: number;
-      spacebarhold: number;
-    },
+    keys: Keys,
     spacebarCallback: () => void,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>,
     map: WorldMap
   ): void {
     const deltaTime = (Date.now() - this.lastUpdate) / 1000;
-    let shouldApplyExternalForce = true;
     this.lastUpdate = Date.now();
-    //Check if spacebar was pressed and there is no current spacebar action
-
-    if (keys.spacebartime != 0 && !this.isAttacking && !this.dashEnd) {
-      //Swing attack if time under 300 ms
-      if (keys.spacebartime < 300) {
-        this.isAttacking = true;
-        (this.sword as unknown as OwnSword).swing();
-        //Geometry dash attack
-      } else {
-        this.power = Math.min(keys.spacebartime / 1000, 2) * 40;
-        const targetDistance: number = 20 * this.power;
-        this.dashStart = [this.x, this.y, Date.now()];
-        this.dashEnd = [
-          this.x +
-            targetDistance * Math.cos(((this.rotation + 90) / 180) * Math.PI),
-          this.y -
-            targetDistance * Math.sin(((this.rotation + 90) / 180) * Math.PI),
-        ];
-        console.log(this.dashEnd);
-        (this.sword as unknown as OwnSword).swing();
-      }
-      spacebarCallback();
-    }
-    //Slowing dash
-    if (this.dashEnd) {
-      shouldApplyExternalForce = false;
-      const easing = EasingFunction.easeOut(
-        (Date.now() - this.dashStart[2]) / 1000,
-        0.125
-      );
-      this.x = this.dashStart[0] * (1 - easing) + this.dashEnd[0] * easing;
-      this.y = this.dashStart[1] * (1 - easing) + this.dashEnd[1] * easing;
-      //Stopping dash when slow enough
-      if ((Date.now() - this.dashStart[2]) / 1000 >= 0.125) {
-        socket.emit("dash", this.serialize(), this.power, [
-          this.dashStart[0],
-          this.dashStart[1],
-        ]);
-        socket.emit("swing", this.serialize(), "dash");
-        this.dashEnd = undefined;
-      }
-    } else if (this.isAttacking) {
-      if ((this.sword as unknown as OwnSword).direction === "static") {
-        socket.emit("swing", this.serialize(), "swing");
-        this.isAttacking = false;
-      }
-    }
-    //Happens only if player is not attacking or geometry dashing
-    else {
-      //Changing sword opacity
-      this.sword.swordopacity = Math.min(keys.spacebarhold / 1000, 2) / 2;
+    const currentItem = this.inventory[this.inventoryIndex];
+    currentItem.update(deltaTime, keys, spacebarCallback, socket);
+    if (!currentItem.preventsMovement()) {
       //Set speed vector by which keys are pressed
       this.speedVector = [
         (keys.a ? -10 : 0) + (keys.d ? 10 : 0),
@@ -246,12 +192,11 @@ export class OwnPlayer extends Player {
       this.x += this.speedVector[0] * this.speed * deltaTime * 60;
       this.y += this.speedVector[1] * this.speed * deltaTime * 60;
     }
-    if (shouldApplyExternalForce) {
+    if (!currentItem.preventsExternalForces()) {
       this.x += this.externalForces[0] * deltaTime;
 
       this.y += this.externalForces[1] * deltaTime;
     }
-    (this.sword as unknown as OwnSword).update(deltaTime);
     this.returnToMap(map);
     this.draw(this, context);
   }
@@ -295,15 +240,18 @@ export class OwnPlayer extends Player {
   removeHealth(amount: number) {
     this.health -= amount;
   }
+  getCurrentItem(): Item & OwnItem {
+    return this.inventory[this.inventoryIndex];
+  }
   reset(): void {
     this.timeouts.forEach((t) => {
       clearTimeout(t);
     });
     this.externalForces = [0, 0];
-    this.dashEnd = undefined;
-    this.isAttacking = false;
+    this.inventory.forEach((item) => {
+      item.reset();
+    });
     this.size = 1;
-    (this.sword as unknown as OwnSword).reset();
     this.x = 1000;
     this.y = 500;
     this.health = 100;

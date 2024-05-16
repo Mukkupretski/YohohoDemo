@@ -114,7 +114,10 @@ window.addEventListener("keydown", (e) => {
       keys.s = true;
       break;
     case " ":
-      if (!keys.spacebardown && !ownPlayer.isAttacking && !ownPlayer.dashEnd) {
+      if (
+        !keys.spacebardown &&
+        ownPlayer.getCurrentItem().preventsExternalForces()
+      ) {
         keys.spacebardown = new Date().getTime();
       }
   }
@@ -139,7 +142,10 @@ window.addEventListener("keyup", (e) => {
       keys.s = false;
       break;
     case " ":
-      if (!ownPlayer.isAttacking && !ownPlayer.dashEnd && keys.spacebardown) {
+      if (
+        !ownPlayer.getCurrentItem().preventsSpacebarHold() &&
+        keys.spacebardown
+      ) {
         keys.spacebartime = new Date().getTime() - keys.spacebardown;
         keys.spacebardown = undefined;
       }
