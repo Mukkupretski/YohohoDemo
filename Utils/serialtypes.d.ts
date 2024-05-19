@@ -1,4 +1,5 @@
-import { ThingTypes, Skins, Swords } from "./enums";
+import { ThingTypes, Skins, Swords, ItemTypes } from "./enums";
+import { Picture } from "./othertypes";
 import { Thing } from "./thingclasses";
 
 export type SerializedThing = {
@@ -18,8 +19,8 @@ export interface SerializedPlayer {
   size: number;
   name: string;
   health: number;
-  skin: Skins;
-  sword: SerializedSword;
+  picture: Picture;
+  item?: SerializedItem;
 }
 export interface SerializedGrassPatch {
   x: number;
@@ -27,12 +28,13 @@ export interface SerializedGrassPatch {
   width: number;
   height: number;
 }
-export interface SerializedSword {
+export interface SerializedItem {
   angle: number;
-  swordopacity: number;
-  swordskin: Swords;
-  swordwidth: number;
-  swordheight: number;
+  opacity?: number;
+  picture: Picture;
+  width: number;
+  height: number;
+  type: ItemTypes;
 }
 export interface SerializedOtherPlayer extends SerializedPlayer {
   id: string;

@@ -6,10 +6,14 @@ import { OtherPlayer, OwnPlayer } from "./Utils/playerclasses";
 import { Skins, Swords } from "./Utils/enums";
 import { SCALE, WATER_COLOR } from "./Utils/constants";
 import { Game } from "./Utils/Game";
+import { OwnSword } from "./Utils/weaponclasses";
+import { loadImages } from "./imageLoader";
 
 //#endregion
 
 //#region initializing canvas
+
+loadImages();
 
 const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
 const ctx = canvas.getContext("2d")!;
@@ -27,12 +31,8 @@ window.addEventListener("resize", initializeCanvas);
 
 //#region initializing players
 
-const ownPlayer: OwnPlayer = new OwnPlayer(
-  1000,
-  500,
-  Skins.AMOGUS,
-  Swords.PYTHAGORAS
-);
+const ownPlayer: OwnPlayer = new OwnPlayer(1000, 500, Skins.PIRATE2, []);
+ownPlayer.inventory.push(new OwnSword(ownPlayer, Swords.SHARKNADO));
 
 // ownPlayer.setSpeed(5);
 
@@ -114,10 +114,13 @@ window.addEventListener("keydown", (e) => {
       keys.s = true;
       break;
     case " ":
+      console.log(!keys.spacebardown);
+      console.log(!ownPlayer.getCurrentItem().preventsSpacebarHold());
       if (
         !keys.spacebardown &&
-        ownPlayer.getCurrentItem().preventsExternalForces()
+        !ownPlayer.getCurrentItem().preventsSpacebarHold()
       ) {
+        console.log("HERE");
         keys.spacebardown = new Date().getTime();
       }
   }
@@ -195,6 +198,9 @@ socket.on("playerChange", (otherPlayer) => {
   game!.players
     .find((p) => p.id === otherPlayer.id)!
     .setProperties(otherPlayer);
+});
+socket.on("setItem", (otherPlayer, item) => {
+  game!.players.find((p) => p.id === otherPlayer.id)!.setItem(item);
 });
 
 socket.on("playerLeft", (id) => {

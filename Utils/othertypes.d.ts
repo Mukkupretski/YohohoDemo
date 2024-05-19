@@ -1,3 +1,5 @@
+import { ImageEnum } from "./Images";
+
 type Keys = {
   w: boolean;
   d: boolean;
@@ -7,8 +9,8 @@ type Keys = {
   spacebarhold: number;
 };
 type Picture = {
-  path: string;
-  coords: {
+  image: ImageEnum;
+  coords?: {
     x: number;
     y: number;
     width: number;

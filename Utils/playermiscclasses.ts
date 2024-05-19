@@ -1,14 +1,9 @@
-import { Swords } from "./enums";
-import { OtherPlayer, OwnPlayer, Player } from "./playerclasses";
+import { OwnPlayer, Player } from "./playerclasses";
 import { Thing } from "./thingclasses";
-import {
-  IMAGE_PATH,
-  NO_RENDER_COLOR,
-  PLAYER_HEADER_PADDING,
-} from "./constants";
-import { SerializedSword } from "./serialtypes";
+import { NO_RENDER_COLOR, PLAYER_HEADER_PADDING } from "./constants";
 import { Animation } from "./animationlib";
-import { chatbubble, getAnimationById } from "./animations";
+import { getAnimationById } from "./animations";
+import { ImageEnum, getImage } from "./Images";
 
 export type Obj = {
   width: number;
@@ -81,9 +76,10 @@ export class Emote {
       -(player.height / 2) * scale - 64 * scale
     );
     context.save();
-    if (chatbubble) {
+    const img = getImage(ImageEnum.CHATBUBBLE);
+    if (img) {
       context.drawImage(
-        chatbubble,
+        img,
         -64 * scale,
         -64 * scale,
         128 * scale,

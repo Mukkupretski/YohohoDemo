@@ -1,18 +1,19 @@
 import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
-import { Skins, Swords } from "./enums";
+import { ItemTypes, Skins, Swords } from "./enums";
 import { Emote, PlayerHeader } from "./playermiscclasses";
 import { Sword, OwnSword } from "./weaponclasses";
 import { Thing } from "./thingclasses";
 import {
   SerializedOtherPlayer,
   SerializedPlayer,
-  SerializedSword,
+  SerializedItem,
 } from "./serialtypes";
 import { Socket } from "socket.io-client";
 import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
-import { EasingFunction } from "./animationlib";
 import WorldMap from "./WorldMap";
 import { Item, OwnItem } from "./itemclasses";
+import { Keys, Picture } from "./othertypes";
+import { ImageEnum, getImage } from "./Images";
 
 export abstract class Player {
   rotation: number;
@@ -23,53 +24,56 @@ export abstract class Player {
   width: number;
   health: number;
   height: number;
-  image: CanvasImageSource | undefined;
-  skin: Skins;
-  sword: Sword;
+  picture: Picture;
   playerheader: PlayerHeader;
   emote: Emote | undefined;
   constructor(
     x: number,
     y: number,
     size: number,
-    skin: Skins,
+    skin: Skins | Picture,
     rotation: number,
     health: number,
-    name: string,
-    swordskin: Swords,
-    swordprops?: { swordopacity: number; angle: number }
+    name: string
   ) {
     this.x = x;
     this.y = y;
     this.size = size;
     this.width = 256;
     this.height = 256;
-    this.skin = skin;
+    if (typeof skin === "number") {
+      this.picture = {
+        image: ImageEnum.SKIN,
+        coords: {
+          x: 256 * (skin % 4),
+          y: 256 * Math.floor(skin / 4),
+          width: 256,
+          height: 256,
+        },
+      };
+    } else {
+      this.picture = skin;
+    }
     this.playerheader = new PlayerHeader(this);
     this.rotation = rotation;
     this.health = health;
-    if (swordprops) {
-      this.sword = new Sword(
-        this,
-        swordskin,
-        swordprops.angle,
-        swordprops.swordopacity
-      );
-    } else {
-      this.sword = new OwnSword(this as unknown as OwnPlayer, swordskin);
-    }
+
     this.name = name;
-    const skinImage = document.createElement("img");
-    skinImage.src = `${IMAGE_PATH}/skinsheet.svg`;
-    skinImage.onload = () => {
-      this.image = skinImage;
-    };
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     if (!Thing.isInscreen(player, context.canvas, this)) return;
     const scale = this.size / player.size;
     //Draw sword and header
-    this.sword.draw(player, context);
+    let item = undefined;
+    if (
+      this instanceof OwnPlayer &&
+      this.inventoryIndex < this.inventory.length
+    ) {
+      item = this.getCurrentItem();
+    } else if (this instanceof OtherPlayer) {
+      item = this.item;
+    }
+    item?.draw(player, context);
     this.playerheader.draw(player, context);
     if (this.emote != undefined) {
       this.emote.draw(player, context);
@@ -79,15 +83,15 @@ export abstract class Player {
 
     Thing.doTranslate(player, context, this);
     context.rotate((-this.rotation / 180) * Math.PI);
-    if (this.image) {
-      const skinpos = [this.skin % 4, Math.floor(this.skin / 4)];
-
+    const img = getImage(this.picture.image);
+    if (img) {
+      const coords = this.picture.coords!;
       context.drawImage(
-        this.image,
-        256 * skinpos[0],
-        256 * skinpos[1],
-        256,
-        256,
+        img,
+        coords.x,
+        coords.y,
+        coords.width,
+        coords.height,
 
         (-this.width / 2) * scale,
         (-this.width / 2) * scale,
@@ -113,6 +117,17 @@ export abstract class Player {
       }, this.emote.animation.time * 1000 + 1000);
     }
   }
+  setSkin(skin: Skins): void {
+    this.picture.coords!.x = (skin % 4) * 256;
+    this.picture.coords!.y = Math.floor(skin / 4) * 256;
+    if (this instanceof OwnPlayer) {
+      this.inventory.forEach((item) => {
+        item.updateHand();
+      });
+    } else if (this instanceof OtherPlayer) {
+      this.item?.updateHand();
+    }
+  }
 }
 
 export class OwnPlayer extends Player {
@@ -127,8 +142,8 @@ export class OwnPlayer extends Player {
   timeouts: ReturnType<typeof setTimeout>[];
   inventory: (Item & OwnItem)[];
   inventoryIndex: number;
-  constructor(x: number, y: number, skin: Skins, swordskin: Swords) {
-    super(x, y, 1, skin, 0, 100, "", swordskin);
+  constructor(x: number, y: number, skin: Skins, items: (Item & OwnItem)[]) {
+    super(x, y, 1, skin, 0, 100, "");
     this.targetrotation = 0;
     this.coins = 0;
     this.speedVector = [0, 0];
@@ -138,7 +153,7 @@ export class OwnPlayer extends Player {
     this.lastUpdate = Date.now();
 
     this.timeouts = [];
-    this.inventory = [];
+    this.inventory = items;
     this.inventoryIndex = 0;
   }
   update(
@@ -150,9 +165,12 @@ export class OwnPlayer extends Player {
   ): void {
     const deltaTime = (Date.now() - this.lastUpdate) / 1000;
     this.lastUpdate = Date.now();
-    const currentItem = this.inventory[this.inventoryIndex];
-    currentItem.update(deltaTime, keys, spacebarCallback, socket);
-    if (!currentItem.preventsMovement()) {
+    let currentItem;
+    if (this.inventoryIndex < this.inventory.length) {
+      currentItem = this.getCurrentItem();
+      currentItem.update(deltaTime, keys, spacebarCallback, socket);
+    }
+    if (!currentItem || !currentItem.preventsMovement()) {
       //Set speed vector by which keys are pressed
       this.speedVector = [
         (keys.a ? -10 : 0) + (keys.d ? 10 : 0),
@@ -192,7 +210,7 @@ export class OwnPlayer extends Player {
       this.x += this.speedVector[0] * this.speed * deltaTime * 60;
       this.y += this.speedVector[1] * this.speed * deltaTime * 60;
     }
-    if (!currentItem.preventsExternalForces()) {
+    if (!currentItem || !currentItem.preventsExternalForces()) {
       this.x += this.externalForces[0] * deltaTime;
 
       this.y += this.externalForces[1] * deltaTime;
@@ -227,12 +245,6 @@ export class OwnPlayer extends Player {
       this.y = map.size - (this.height * this.size) / 2;
     }
   }
-  setSkin(skin: Skins): void {
-    this.skin = skin;
-  }
-  setSwordSkin(swordskin: Swords): void {
-    this.sword.swordskin = swordskin;
-  }
   grow(amount: number) {
     this.size += amount / 10;
     this.health = this.health * this.size;
@@ -263,8 +275,8 @@ export class OwnPlayer extends Player {
       y: this.y,
       name: this.name,
       size: this.size,
-      skin: this.skin,
-      sword: this.sword.serialize(),
+      picture: this.picture,
+      item: this.getCurrentItem().serialize(),
       rotation: this.rotation,
       height: this.height,
       width: this.width,
@@ -273,45 +285,41 @@ export class OwnPlayer extends Player {
 }
 export class OtherPlayer extends Player {
   id: string;
+  item: Item | undefined;
   constructor({
     x,
     y,
     size,
-    skin,
-    sword,
-
+    picture,
+    item,
     rotation,
     health,
     id,
     name,
-  }: {
-    x: number;
-    y: number;
-    size: number;
-    skin: Skins;
-    sword: SerializedSword;
-    rotation: number;
-    health: number;
-    id: string;
-    name: string;
-  }) {
-    super(x, y, size, skin, rotation, health, name, sword.swordskin, {
-      swordopacity: sword.swordopacity,
-      angle: sword.angle,
-    });
+  }: SerializedOtherPlayer) {
+    super(x, y, size, picture, rotation, health, name);
     this.id = id;
+    this.setItem(item);
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     this.draw(player, context);
+  }
+  setItem(item: SerializedItem | undefined) {
+    if (!item) {
+      this.item = undefined;
+      return;
+    }
+    if (item.type == ItemTypes.SWORD) {
+      this.item = new Sword(this, item.angle, item.opacity!, item.picture);
+    }
   }
   setProperties(player: SerializedOtherPlayer) {
     this.x = player.x;
     this.y = player.y;
     this.size = player.size;
-    this.skin = player.skin;
+    this.picture = player.picture;
     this.health = player.health;
     this.rotation = player.rotation;
     this.name = player.name;
-    this.sword.setSword(player.sword);
   }
 }

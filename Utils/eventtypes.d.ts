@@ -1,5 +1,6 @@
 import {
   SerializedGame,
+  SerializedItem,
   SerializedOtherPlayer,
   SerializedPlayer,
 } from "./serialtypes";
@@ -12,6 +13,7 @@ export type ServerToClientEvents = {
   mapInit: (map: SerializedGame) => void;
   playerLeft: (id: string) => void;
   emote: (emoteId: number, id: string) => void;
+  setItem: (player: SerializedOtherPlayer, item: SerializedItem) => void;
 };
 export type ClientToServerEvents = {
   playerJoined: (player: SerializedPlayer) => void;
@@ -23,4 +25,5 @@ export type ClientToServerEvents = {
     dashStart: [number, number]
   ) => void;
   emote: (emoteId: number) => void;
+  setItem: (player: SerializedPlayer, item: SerializedItem) => void;
 };

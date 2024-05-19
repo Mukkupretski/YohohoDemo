@@ -1,3 +1,4 @@
+import { ImageEnum } from "./Images";
 import {
   AnimationImageObject,
   Animation,
@@ -22,7 +23,7 @@ export function getAnimationById(id: number): Animation {
       new AnimationPart(new SCALE(4, 4), 0.7, 0.2, EasingFunction.easeIn),
     ],
     { x: 0, y: 10, width: 24, height: 24, rotation: 0, opacity: 0 },
-    `${IMAGE_PATH}/Emotes/fire.svg`
+    ImageEnum.FIRE
   );
   const hole = new AnimationPathObject(
     [
@@ -130,7 +131,7 @@ export function getAnimationById(id: number): Animation {
       height: 8,
       rotation: 0,
     },
-    `${IMAGE_PATH}/Emotes/cross.svg`
+    ImageEnum.CROSS
   );
   //#endregion
   //#region crowbar
@@ -144,7 +145,7 @@ export function getAnimationById(id: number): Animation {
       new AnimationPart(new ROTATE(50), 1.9, 0.5, EasingFunction.easeOut),
     ],
     { x: -5, y: -5, rotation: 50, opacity: 1, width: 48, height: 48 },
-    `${IMAGE_PATH}/Emotes/crowbar.svg`
+    ImageEnum.CROWBAR
   );
   const wall = new AnimationPathObject(
     [],
@@ -167,7 +168,7 @@ export function getAnimationById(id: number): Animation {
   const amogus = new AnimationImageObject(
     [],
     { x: 0, y: -10, width: 64, height: 64, rotation: 0, opacity: 1 },
-    `${IMAGE_PATH}/Emotes/amogus.svg`
+    ImageEnum.AMOGUS
   );
   const amogushand = new AnimationImageObject(
     [
@@ -180,7 +181,7 @@ export function getAnimationById(id: number): Animation {
       new AnimationPart(new MOVE(-35, 5), 2.25, 0.1, EasingFunction.easeInOut),
     ],
     { x: -35, y: 11, width: 24, height: 24, rotation: 0, opacity: 1 },
-    `${IMAGE_PATH}/Emotes/amogushand.svg`
+    ImageEnum.AMOGUSHAND
   );
   const amogusknife = new AnimationImageObject(
     [
@@ -212,7 +213,7 @@ export function getAnimationById(id: number): Animation {
       ),
     ],
     { x: -35, y: 10, width: 36, height: 12, rotation: 0, opacity: 1 },
-    `${IMAGE_PATH}/Emotes/knife.svg`
+    ImageEnum.KNIFE
   );
   const amogusEye = new AnimationPathObject(
     [
@@ -262,9 +263,3 @@ export function getAnimationById(id: number): Animation {
       return new Animation([]);
   }
 }
-export let chatbubble: CanvasImageSource | undefined = undefined;
-const chatbubbleElem = document.createElement("img");
-chatbubbleElem.src = `${IMAGE_PATH}/Emotes/chatbubble.svg`;
-chatbubbleElem.onload = () => {
-  chatbubble = chatbubbleElem;
-};

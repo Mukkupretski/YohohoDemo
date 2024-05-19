@@ -3,7 +3,18 @@ export enum Skins {
   NORMAL,
   PYTHAGORAS,
   PROCHARACTER,
+  HUMAN,
   PIRATE,
+  PIRATE2,
+  GIGACHAD,
+  TRUMP,
+  ROBLOX,
+  PINK,
+  GHOST,
+}
+
+export enum ItemTypes {
+  SWORD = "sword",
 }
 
 export enum ThingTypes {
@@ -20,4 +31,5 @@ export enum ThingTypes {
 
 export enum Swords {
   PYTHAGORAS,
+  SHARKNADO,
 }

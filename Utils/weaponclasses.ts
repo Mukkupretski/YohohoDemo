@@ -1,91 +1,98 @@
 import { Socket } from "socket.io-client";
-import { IMAGE_PATH, NO_RENDER_COLOR } from "./constants";
-import { Swords } from "./enums";
+import { ItemTypes, Swords } from "./enums";
 import { Item, OwnItem } from "./itemclasses";
 import { OwnPlayer, Player } from "./playerclasses";
-import { SerializedSword } from "./serialtypes";
+import { SerializedItem } from "./serialtypes";
 import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
 import { EasingFunction } from "./animationlib";
+import { Keys, Picture } from "./othertypes";
+import { ImageEnum, getImage } from "./Images";
 
 export class Sword extends Item {
-  swordimg: CanvasImageSource | undefined;
-  swordopacity: number;
-  swordskin: Swords;
-  swordwidth: number;
-  swordheight: number;
-
+  opacity: number;
+  picture: Picture;
   constructor(
     owner: Player,
-    swordskin: Swords,
     angle: number,
-    swordopacity: number
+    opacity: number,
+    sword: Swords | Picture
   ) {
-    super(owner, angle);
-    this.swordheight = 64;
-    this.swordwidth = 256;
-    this.swordskin = swordskin;
-    this.swordopacity = swordopacity;
-
-    const swordel = document.createElement("img");
-    swordel.src = `${IMAGE_PATH}/swordsheet.svg`;
-    swordel.onload = () => {
-      this.swordimg = swordel;
-    };
+    super(owner, angle, 256, 64);
+    this.opacity = opacity;
+    if (typeof sword === "number") {
+      this.picture = {
+        image: ImageEnum.SWORD,
+        coords: {
+          x: (sword % 4) * 256,
+          y: Math.floor(sword / 4) * 128,
+          width: 256,
+          height: 64,
+        },
+      };
+    } else {
+      this.picture = sword;
+    }
   }
 
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     this.drawHandAndTranlate(player, context);
     const scale = this.owner.size / player.size;
     //Sword: handle at player's width's end, height centered to player's center
-    if (this.swordimg) {
-      const skinpos = [this.swordskin % 4, Math.floor(this.swordskin / 4)];
+    const img = getImage(this.picture.image);
+    if (img) {
+      const coords = this.picture.coords!;
       context.drawImage(
-        this.swordimg,
-        skinpos[0] * 256,
-        skinpos[1] * 128,
-        256,
-        64,
-        (-this.owner.width / 2 - this.swordwidth) * scale,
-        -this.swordheight * scale,
-        this.swordwidth * scale,
-        this.swordheight * scale
+        img,
+        coords.x,
+        coords.y,
+        coords.width,
+        coords.height,
+        (-this.owner.width / 2 - this.width) * scale,
+        -this.height * scale,
+        this.width * scale,
+        this.height * scale
       );
-      context.globalAlpha = this.swordopacity;
+      context.globalAlpha = this.opacity;
       context.drawImage(
-        this.swordimg,
-        skinpos[0] * 256,
-        skinpos[1] * 128 + 64,
-        256,
-        64,
-        (-this.owner.width / 2 - this.swordwidth) * scale,
-        -this.swordheight * scale,
-        this.swordwidth * scale,
-        this.swordheight * scale
+        img,
+        coords.x,
+        coords.y + 64,
+        coords.width,
+        coords.height,
+        (-this.owner.width / 2 - this.width) * scale,
+        -this.height * scale,
+        this.width * scale,
+        this.height * scale
       );
     } else {
       context.fillRect(
-        (-this.owner.width - this.swordwidth / 2) * scale,
-        -this.swordheight * scale,
-        this.swordwidth * scale,
-        this.swordheight * scale
+        (-this.owner.width - this.width / 2) * scale,
+        -this.height * scale,
+        this.width * scale,
+        this.height * scale
       );
     }
     context.restore();
   }
 
-  serialize(): SerializedSword {
+  serialize(): SerializedItem {
     return {
       angle: this.angle,
-      swordopacity: this.swordopacity,
-      swordskin: this.swordskin,
-      swordwidth: this.swordwidth,
-      swordheight: this.swordheight,
+      opacity: this.opacity,
+      picture: this.picture,
+      width: this.width,
+      height: this.height,
+      type: ItemTypes.SWORD,
     };
   }
-  setSword(sword: SerializedSword): void {
+  setSword(sword: SerializedItem): void {
     this.angle = sword.angle;
-    this.swordopacity = sword.swordopacity;
-    this.swordskin = sword.swordskin;
+    this.opacity = sword.opacity!;
+    this.picture = sword.picture;
+  }
+  setSkin(skin: Swords): void {
+    this.picture.coords!.x = (skin % 4) * 256;
+    this.picture.coords!.y = Math.floor(skin / 4) * 128;
   }
 }
 
@@ -97,17 +104,17 @@ export class OwnSword extends Sword implements OwnItem {
   isAttacking: boolean;
   power: number;
   constructor(owner: OwnPlayer, swordskin: Swords) {
-    super(owner, swordskin, 30, 0);
+    super(owner, 30, 0, swordskin);
     this.direction = "static";
-    this.owner = owner;
     this.power = 0;
+    this.owner = owner;
     this.isAttacking = false;
     this.dashStart = [0, 0, 0];
   }
 
   reset(): void {
     this.angle = 30;
-    this.swordopacity = 0;
+    this.opacity = 0;
     this.direction = "static";
   }
   swing() {
@@ -138,6 +145,7 @@ export class OwnSword extends Sword implements OwnItem {
     //Check if spacebar was pressed and there is no current spacebar action
 
     if (keys.spacebartime != 0 && !this.isAttacking && !this.dashEnd) {
+      console.log("Sw");
       //Swing attack if time under 300 ms
       if (keys.spacebartime < 300) {
         this.isAttacking = true;
@@ -185,7 +193,7 @@ export class OwnSword extends Sword implements OwnItem {
       }
     }
     if (!this.preventsSpacebarHold()) {
-      this.swordopacity = Math.min(keys.spacebarhold / 1000, 2) / 2;
+      this.opacity = Math.min(keys.spacebarhold / 1000, 2) / 2;
     }
     if (this.direction !== "static") {
       if (this.angle >= 140 && this.direction == "right") {

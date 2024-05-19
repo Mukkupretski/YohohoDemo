@@ -4,6 +4,7 @@ import { OtherPlayer, OwnPlayer } from "./playerclasses";
 import { SerializedGame } from "./serialtypes";
 import { ClientToServerEvents, ServerToClientEvents } from "./eventtypes";
 import { SAND_COLOR, MAP_COLOR, LINE_COLOR, MAP_GRID_WIDTH } from "./constants";
+import { Keys } from "./othertypes";
 
 export class Game {
   id: string;

@@ -1,3 +1,6 @@
+import { ImageEnum, getImage } from "./Images";
+import { Picture } from "./othertypes";
+
 export abstract class AnimationType {
   abstract updateThing(
     obj: AnimationObject,
@@ -199,7 +202,7 @@ export abstract class AnimationObject {
 }
 
 export class AnimationImageObject extends AnimationObject {
-  imageSrc: CanvasImageSource | undefined;
+  picture: Picture;
   constructor(
     animationParts: AnimationPart[],
     {
@@ -217,14 +220,10 @@ export class AnimationImageObject extends AnimationObject {
       rotation: number;
       opacity: number;
     },
-    imagePath: string
+    image: ImageEnum
   ) {
     super(animationParts, x, y, width, height, rotation, opacity);
-    const img = document.createElement("img");
-    img.src = imagePath;
-    img.onload = () => {
-      this.imageSrc = img;
-    };
+    this.picture = { image: image };
   }
   drawSelf(context: CanvasRenderingContext2D, scale: number): void {
     //Assuming translation is such that the thing is in the middle of chatbubble
@@ -233,9 +232,10 @@ export class AnimationImageObject extends AnimationObject {
     context.translate(this.x * scale, this.y * scale);
     context.rotate((-this.rotation / 180) * Math.PI);
     context.globalAlpha = this.opacity;
-    if (this.imageSrc) {
+    const img = getImage(this.picture.image);
+    if (img) {
       context.drawImage(
-        this.imageSrc,
+        img,
         (-this.width / 2) * scale,
         (-this.height / 2) * scale,
         this.width * scale,
