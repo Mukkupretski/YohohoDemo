@@ -19,7 +19,7 @@ export class Game {
   }
 
   static generateGame(id: string): SerializedGame {
-    return { map: WorldMap.generateMap(20000), id: id, players: [] };
+    return { map: WorldMap.generateTestMap(20000), id: id, players: [] };
   }
   render(
     player: OwnPlayer,

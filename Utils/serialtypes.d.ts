@@ -1,12 +1,12 @@
 import { ThingTypes, Skins, Swords, ItemTypes } from "./enums";
 import { Picture } from "./othertypes";
-import { Thing } from "./thingclasses";
 
 export type SerializedThing = {
   x: number;
   y: number;
   rotation: number;
   thingType: ThingTypes;
+  picture: Picture;
   width: number;
   height: number;
 };

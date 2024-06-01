@@ -31,7 +31,7 @@ window.addEventListener("resize", initializeCanvas);
 
 //#region initializing players
 
-const ownPlayer: OwnPlayer = new OwnPlayer(1000, 500, Skins.PIRATE2, []);
+const ownPlayer: OwnPlayer = new OwnPlayer(1000, 500, Skins.ROBLOX, []);
 ownPlayer.inventory.push(new OwnSword(ownPlayer, Swords.SHARKNADO));
 
 // ownPlayer.setSpeed(5);
@@ -210,8 +210,12 @@ socket.on("playerLeft", (id) => {
 socket.on("playerDamage", (damager, damage) => {
   ownPlayer.removeHealth(damage * damager.size);
   if (ownPlayer.health <= 0) {
+    socket.emit("playerDied", ownPlayer.serialize());
     ownPlayer.reset();
   }
+});
+socket.on("mapChanged", (dynamicBackground, dynamicForeground) => {
+  game!.map.updateMap(dynamicBackground, dynamicForeground);
 });
 socket.on("playerForce", (force, duration) => {
   ownPlayer.applyExternalForce(force, duration);

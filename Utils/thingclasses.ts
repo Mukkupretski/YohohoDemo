@@ -8,27 +8,25 @@ import {
 } from "./constants";
 import { SerializedGrassPatch, SerializedThing } from "./serialtypes";
 import { ThingTypes } from "./enums";
+import { Picture } from "./othertypes";
+import { ImageEnum, getImage } from "./Images";
 
 export class Thing {
-  image: CanvasImageSource | undefined;
   width: number;
   height: number;
   x: number;
   y: number;
   rotation: number;
   thingType: ThingTypes;
+  picture: Picture;
   constructor(thing: SerializedThing) {
-    const elem = document.createElement("img");
     this.thingType = thing.thingType;
-    elem.src = `${IMAGE_PATH}/${this.thingType}`;
-    elem.onload = () => {
-      this.image = elem;
-    };
     this.width = thing.width;
     this.height = thing.height;
     this.x = thing.x;
     this.y = thing.y;
     this.rotation = thing.rotation;
+    this.picture = thing.picture;
   }
   static isInscreen(
     player: OwnPlayer,
@@ -48,10 +46,11 @@ export class Thing {
     if (!Thing.isInscreen(player, context.canvas, this)) return;
     context.save();
     Thing.doTranslate(player, context, this);
-    context.rotate(((-2 * Math.PI) / 180) * this.rotation);
-    if (this.image) {
+    context.rotate(((-1 * Math.PI) / 180) * this.rotation);
+    const img = getImage(this.picture.image);
+    if (img) {
       context.drawImage(
-        this.image,
+        img,
         -this.width / player.size / 2,
         -this.height / player.size / 2,
         this.width / player.size,
@@ -98,11 +97,12 @@ export class Thing {
       width: thing.width,
       height: thing.height,
       thingType: thing.thingType,
+      picture: thing.picture,
     };
   }
   static collide(
-    thing1: Thing | SerializedThing,
-    thing2: Thing | SerializedThing
+    thing1: Thing | SerializedThing | Obj,
+    thing2: Thing | SerializedThing | Obj
   ): boolean {
     return (
       (thing1.width + thing2.width) / 2 > Math.abs(thing1.x - thing2.x) &&
@@ -117,7 +117,8 @@ export abstract class Interactable extends Thing {
     height: number,
     x: number,
     y: number,
-    rotation: number
+    rotation: number,
+    picture: Picture
   ) {
     super({
       thingType: thingType,
@@ -126,6 +127,7 @@ export abstract class Interactable extends Thing {
       x: x,
       y: y,
       rotation: rotation,
+      picture: picture,
     });
   }
   overlap(player: OwnPlayer): boolean {
@@ -147,36 +149,33 @@ export abstract class LayerSwitcher extends Interactable {
     height: number,
     x: number,
     y: number,
-    rotation: number
+    rotation: number,
+    picture: Picture
   ) {
-    super(thingType, width, height, x, y, rotation);
+    super(thingType, width, height, x, y, rotation, picture);
     this.onForeground = false;
   }
   abstract update(player: OwnPlayer, context: CanvasRenderingContext2D): void;
 }
 
 export class Hut extends LayerSwitcher {
-  floorimg: CanvasImageSource | undefined;
-  hutimg: CanvasImageSource | undefined;
   constructor(thing: SerializedThing) {
-    super(ThingTypes.HUT, 784, 784, thing.x, thing.y, thing.rotation);
-    const floorelem = document.createElement("img");
-    floorelem.src = `${IMAGE_PATH}/${ThingTypes.HUTFLOOR}`;
-    floorelem.onload = () => {
-      this.floorimg = floorelem;
-    };
-    const hutelem = document.createElement("img");
-    hutelem.src = `${IMAGE_PATH}/${ThingTypes.HUT}`;
-    hutelem.onload = () => {
-      this.hutimg = hutelem;
-    };
+    super(
+      ThingTypes.HUT,
+      thing.width,
+      thing.height,
+      thing.x,
+      thing.y,
+      thing.rotation,
+      thing.picture
+    );
   }
   update(player: OwnPlayer, context: CanvasRenderingContext2D): void {
     if (this.overlap(player)) {
-      this.image = this.floorimg;
+      this.picture = { image: ImageEnum.HUTFLOOR };
       this.onForeground = false;
     } else {
-      this.image = this.hutimg;
+      this.picture = { image: ImageEnum.HUT };
       this.onForeground = true;
     }
     this.draw(player, context);
@@ -190,7 +189,7 @@ export class GrassPatch {
   constructor(grassPatch: SerializedGrassPatch) {
     this.x = grassPatch.x;
     this.y = grassPatch.y;
-    this.r = grassPatch.width;
+    this.r = grassPatch.width / 2;
   }
   draw(player: OwnPlayer, context: CanvasRenderingContext2D) {
     context.save();

@@ -3,6 +3,5 @@
 /.env
 /yarn.lock
 /tsconfig.json
-/package.json
 /snowpack.config.js
 /.hintrc
